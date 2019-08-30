@@ -56,7 +56,9 @@ export class MailSenderService {
     const sended = await new Promise<boolean>(async (resolve, reject) => {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
-          return reject(false);
+          // TODO: change this with logger
+          console.log('Mail sending failed, check your service credentials.');
+          resolve(false);
         }
         resolve(true);
       });

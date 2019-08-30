@@ -5,6 +5,7 @@ import {
   HttpCode,
   Get,
   UseGuards,
+  Param,
 } from '@nestjs/common';
 import {
   SignupRequest,
@@ -43,5 +44,21 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async getUserWithToken(@Usr() user: User): Promise<GetResponse<IUser>> {
     return new GetResponse<IUser>(toUserModel(user));
+  }
+
+  @Get('verify/:token')
+  async verifyMail(@Param('token') token: string): Promise<void> {
+    await this.authService.verifyMail(token);
+  }
+
+  @Get('resend-verification')
+  @HttpCode(200)
+  @UseGuards(AuthGuard())
+  async resendVerificationMail(@Usr() user: User): Promise<void> {
+    await this.authService.resendVerificationMail(
+      user.firstName,
+      user.email,
+      user.id,
+    );
   }
 }
