@@ -1,7 +1,11 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import { Repository, FindConditions } from 'typeorm';
+import { Repository } from 'typeorm';
 import { SignupRequest } from '../contract';
 
 @Injectable()
@@ -48,6 +52,16 @@ export class UserService {
     } catch (err) {
       // TODO: err also returns pwd hash :)
       throw new ConflictException(err);
+    }
+  }
+
+  public async updateUser(userEntity: User): Promise<void> {
+    // TODO: Email update should be seperated
+    // TODO: Add validation
+    try {
+      await this.userRepository.update(userEntity.id, userEntity);
+    } catch (err) {
+      throw new BadRequestException(err);
     }
   }
 }
