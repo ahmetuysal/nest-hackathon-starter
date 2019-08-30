@@ -33,16 +33,19 @@ export class MailSenderService {
     const buttonLink = `${config.project.mailVerificationUrl}?token=${token}`;
 
     const mail = confirmMail
-      .replace('--PersonName--', name)
-      .replace('--ProjectName--', config.project.name)
-      .replace('--ProjectAddress--', config.project.address)
-      .replace('--ProjectLogo--', config.project.logoUrl)
-      .replace('--ProjectSlogan--', config.project.slogan)
-      .replace('--ProjectColor--', config.project.color)
-      .replace('--ProjectLink--', config.project.url)
-      .replace('--Socials--', socials)
-      .replace('--ButtonLink--', buttonLink)
-      .replace('--TermsOfServiceLink--', config.project.termsOfServiceUrl);
+      .replace(new RegExp('--PersonName--', 'g'), name)
+      .replace(new RegExp('--ProjectName--', 'g'), config.project.name)
+      .replace(new RegExp('--ProjectAddress--', 'g'), config.project.address)
+      .replace(new RegExp('--ProjectLogo--', 'g'), config.project.logoUrl)
+      .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
+      .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
+      .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
+      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--ButtonLink--', 'g'), buttonLink)
+      .replace(
+        new RegExp('--TermsOfServiceLink--', 'g'),
+        config.project.termsOfServiceUrl,
+      );
 
     const mailOptions = {
       from: `"${config.mail.senderCredentials.name}" <${
