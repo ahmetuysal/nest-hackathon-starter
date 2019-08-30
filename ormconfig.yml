@@ -1,0 +1,22 @@
+default:
+  type: postgres
+  host: localhost
+  port: 5432
+  username: __YOUR_USERNAME__
+  password: __YOUR_PASSWORD__
+  database: __YOUR_DATABASE__
+  synchronize: true
+  logging: true
+  entities:
+    - src/**/*.entity.ts
+    - dist/**/*.entity.js
+  migrations:
+    - database/migrations/**/*.ts
+    - dist/database/migrations/**/*.js
+  subscribers:
+    - database/subscriber/**/*.ts
+    - dist/database/subscriber/**/.js
+  cli:
+    entitiesDir: src
+    migrationsDir: database/migrations
+    subscribersDir: database/subscriber
