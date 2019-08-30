@@ -17,6 +17,9 @@ export class User implements IUser {
   email: string;
 
   @Column('text')
+  passwordHash: string;
+
+  @Column('text')
   firstName: string;
 
   @Column('text')
