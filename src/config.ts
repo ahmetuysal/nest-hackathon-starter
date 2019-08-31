@@ -1,7 +1,7 @@
 export default {
   jwt: {
     secretOrKey: '__JWT_SECRET_KEY__',
-    expiresIn: 3600,
+    expiresIn: 86400,
   },
   // You can also use any other email sending services
   mail: {
