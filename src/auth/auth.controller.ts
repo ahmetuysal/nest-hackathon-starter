@@ -13,6 +13,7 @@ import {
   LoginResponse,
   GetResponse,
   User as IUser,
+  ChangeEmailRequest,
 } from '../contract';
 import { AuthService } from './auth.service';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -46,9 +47,30 @@ export class AuthController {
     return new GetResponse<IUser>(toUserModel(user));
   }
 
-  @Get('verify/:token')
+  @Get('verify')
   async verifyMail(@Param('token') token: string): Promise<void> {
-    await this.authService.verifyMail(token);
+    await this.authService.verifyEmail(token);
+  }
+
+  @ApiBearerAuth()
+  @Post('change-email')
+  @HttpCode(200)
+  @UseGuards(AuthGuard())
+  async sendChangeEmailMail(
+    @Usr() user: User,
+    @Body() changeEmailRequest: ChangeEmailRequest,
+  ): Promise<void> {
+    await this.authService.sendChangeEmailMail(
+      changeEmailRequest,
+      user.id,
+      user.firstName,
+      user.email,
+    );
+  }
+
+  @Get('change-email')
+  async changeEmail(@Param('token') token: string): Promise<void> {
+    await this.authService.changeEmail(token);
   }
 
   @Get('resend-verification')

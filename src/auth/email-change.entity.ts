@@ -1,11 +1,14 @@
 import { Entity, PrimaryColumn, Column, Unique, Index } from 'typeorm';
 
-@Entity('email-verification')
-@Unique('unique_email-verification_userId', ['userId'])
-@Index('index_email-verification__userId', ['userId'])
-export class EmailVerification {
+@Entity('email-change')
+@Unique('unique_email-change_userId', ['userId'])
+@Index('index_email-change_userId', ['userId'])
+export class EmailChange {
   @PrimaryColumn('character', { length: 21 })
   token: string;
+
+  @Column('text')
+  newEmail: string;
 
   @Column('integer')
   userId: number;

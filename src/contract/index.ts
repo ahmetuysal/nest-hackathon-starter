@@ -1,5 +1,6 @@
 export { User } from './models/user.model';
 
+export { ChangeEmailRequest } from './request/change-email-request.model';
 export { LoginRequest } from './request/login-request.model';
 export { SignupRequest } from './request/signup-request.model';
 

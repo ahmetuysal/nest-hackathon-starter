@@ -10,10 +10,11 @@ import { default as config } from '../config';
 import { JwtStrategy } from './jwt.strategy';
 import { MailSenderModule } from '../mail-sender/mail-sender.module';
 import { EmailVerification } from './email-verification.entity';
+import { EmailChange } from './email-change.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, EmailVerification]),
+    TypeOrmModule.forFeature([User, EmailVerification, EmailChange]),
     UserModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({

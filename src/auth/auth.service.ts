@@ -3,8 +3,9 @@ import {
   UnauthorizedException,
   InternalServerErrorException,
   NotFoundException,
+  ConflictException,
 } from '@nestjs/common';
-import { SignupRequest } from '../contract';
+import { SignupRequest, ChangeEmailRequest } from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from './jwt-payload.interface';
@@ -18,12 +19,15 @@ import { Repository } from 'typeorm';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import 'nanoid';
 import nanoid = require('nanoid');
+import { EmailChange } from './email-change.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(EmailVerification)
     private readonly emailVerificationRepository: Repository<EmailVerification>,
+    @InjectRepository(EmailChange)
+    private readonly emailChangeRepository: Repository<EmailChange>,
     private readonly mailSenderService: MailSenderService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
@@ -51,7 +55,7 @@ export class AuthService {
       throw new InternalServerErrorException(err);
     }
 
-    await this.mailSenderService.sendVerifyMailMail(
+    await this.mailSenderService.sendVerifyEmailMail(
       signupRequest.firstName,
       signupRequest.email,
       token,
@@ -81,14 +85,14 @@ export class AuthService {
       emailVerification,
     );
 
-    await this.mailSenderService.sendVerifyMailMail(
+    await this.mailSenderService.sendVerifyEmailMail(
       name,
       email,
       emailVerification.token,
     );
   }
 
-  async verifyMail(token: string): Promise<void> {
+  async verifyEmail(token: string): Promise<void> {
     const emailVerification = await this.emailVerificationRepository.findOne(
       token,
     );
@@ -105,9 +109,63 @@ export class AuthService {
     }
   }
 
+  async sendChangeEmailMail(
+    changeEmailRequest: ChangeEmailRequest,
+    userId: number,
+    name: string,
+    oldEmail: string,
+  ): Promise<void> {
+    // Check whether email is in use
+    const userEntity = await this.userService.getUserEntityByUsername(
+      changeEmailRequest.newEmail,
+    );
+    if (userEntity !== undefined) {
+      throw new ConflictException();
+    }
+
+    // Invalidate old token if exists
+    const oldEmailChangeEntity = await this.emailChangeRepository.findOne({
+      userId,
+    });
+    if (oldEmailChangeEntity !== undefined) {
+      await this.emailChangeRepository.delete(oldEmailChangeEntity);
+    }
+
+    const token = nanoid();
+    const emailChange = new EmailChange();
+    emailChange.token = token;
+    emailChange.userId = userId;
+    // valid for 2 days
+    const twoDaysLater = new Date();
+    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+    emailChange.validUntil = twoDaysLater;
+    try {
+      this.emailChangeRepository.insert(emailChange);
+    } catch (err) {
+      throw new InternalServerErrorException(err);
+    }
+
+    await this.mailSenderService.sendChangeEmailMail(name, oldEmail, token);
+  }
+
+  async changeEmail(token: string): Promise<void> {
+    const emailChange = await this.emailChangeRepository.findOne(token);
+    if (emailChange && emailChange.validUntil > new Date()) {
+      const userEntity = await this.userService.getUserEntityById(
+        emailChange.userId,
+      );
+      userEntity.email = emailChange.newEmail;
+      await this.userService.updateUser(userEntity);
+      await this.emailChangeRepository.delete(emailChange);
+    } else {
+      throw new NotFoundException();
+    }
+  }
+
   async validateUser(payload: JwtPayload): Promise<User> {
     const userEntity = await this.userService.getUserEntityById(payload.id);
     if (
+      userEntity !== undefined &&
       userEntity.email === payload.email &&
       userEntity.username === payload.username
     ) {
