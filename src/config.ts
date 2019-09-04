@@ -30,7 +30,9 @@ export default {
       ['__Social_Media_2__', '__Social_Media_2_URL__'],
     ],
     url: 'http://localhost:4200',
-    mailVerificationUrl: 'http://localhost:4200/signup/validate',
+    mailVerificationUrl: 'http://localhost:3000/auth/verify',
+    mailChangeUrl: 'http://localhost:3000/auth/change-email',
+    resetPasswordUrl: 'http://localhost:4200/reset-password',
     termsOfServiceUrl: 'http://localhost:4200/legal/terms',
   },
 };
