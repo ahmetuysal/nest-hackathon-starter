@@ -9,6 +9,7 @@ import {
   SignupRequest,
   ChangeEmailRequest,
   ResetPasswordRequest,
+  ChangePasswordRequest,
 } from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -221,6 +222,20 @@ export class AuthService {
     } else {
       throw new NotFoundException();
     }
+  }
+
+  async changePassword(
+    changePasswordRequest: ChangePasswordRequest,
+    userId: number,
+    name: string,
+    email: string,
+  ) {
+    await this.userService.updatePassword(
+      userId,
+      await bcrypt.hash(changePasswordRequest.newPassword, 10),
+    );
+
+    await this.mailSenderService.sendPasswordChangeInfoMail(name, email);
   }
 
   async validateUser(payload: JwtPayload): Promise<User> {

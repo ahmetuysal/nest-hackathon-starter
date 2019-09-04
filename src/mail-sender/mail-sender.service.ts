@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { default as config } from '../config';
-import { confirmMail, changeMail, resetPassword } from './templates';
+import {
+  confirmMail,
+  changeMail,
+  resetPassword,
+  changePasswordInfo,
+} from './templates';
 
 @Injectable()
 export class MailSenderService {
@@ -123,6 +128,44 @@ export class MailSenderService {
       }>`,
       to: email, // list of receivers (separated by ,)
       subject: `Reset Your ${config.project.name} Account's Password`,
+      html: mail,
+    };
+
+    const sended = await new Promise<boolean>(async (resolve, reject) => {
+      return await transporter.sendMail(mailOptions, async (error, info) => {
+        if (error) {
+          // TODO: change this with logger
+          console.log('Mail sending failed, check your service credentials.');
+          resolve(false);
+        }
+        resolve(true);
+      });
+    });
+
+    return sended;
+  }
+
+  async sendPasswordChangeInfoMail(name: string, email: string) {
+    const transporter = this.createTransporter();
+    const socials = this.createSocials();
+    const buttonLink = config.project.url;
+    const mail = changePasswordInfo
+      .replace(new RegExp('--PersonName--', 'g'), name)
+      .replace(new RegExp('--ProjectName--', 'g'), config.project.name)
+      .replace(new RegExp('--ProjectAddress--', 'g'), config.project.address)
+      .replace(new RegExp('--ProjectLogo--', 'g'), config.project.logoUrl)
+      .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
+      .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
+      .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
+      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--ButtonLink--', 'g'), buttonLink);
+
+    const mailOptions = {
+      from: `"${config.mail.senderCredentials.name}" <${
+        config.mail.senderCredentials.email
+      }>`,
+      to: email, // list of receivers (separated by ,)
+      subject: `Your ${config.project.name} Account's Password is Changed`,
       html: mail,
     };
 

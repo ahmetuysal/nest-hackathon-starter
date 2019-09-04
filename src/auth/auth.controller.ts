@@ -16,6 +16,7 @@ import {
   User as IUser,
   ChangeEmailRequest,
   ResetPasswordRequest,
+  ChangePasswordRequest,
 } from '../contract';
 import { AuthService } from './auth.service';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -81,6 +82,21 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async sendResetPassword(@Param('email') email: string): Promise<void> {
     await this.authService.sendResetPasswordMail(email);
+  }
+
+  @Post('change-password')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard())
+  async changePassword(
+    @Body() changePasswordRequest: ChangePasswordRequest,
+    @Usr() user: User,
+  ): Promise<void> {
+    await this.authService.changePassword(
+      changePasswordRequest,
+      user.id,
+      user.firstName,
+      user.email,
+    );
   }
 
   @Post('reset-password')
