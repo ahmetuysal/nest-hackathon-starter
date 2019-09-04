@@ -29,6 +29,7 @@
     "bcrypt": "^3.0.6",
     "class-transformer": "^0.2.3",
     "class-validator": "^0.10.0",
+    "helmet": "^3.21.0",
     "nanoid": "^2.0.4",
     "nodemailer": "^6.3.0",
     "passport": "^0.4.0",
