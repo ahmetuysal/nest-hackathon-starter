@@ -2,11 +2,13 @@ import {
   Injectable,
   ConflictException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { SignupRequest } from '../contract';
+import { isNullOrUndefined } from 'util';
 
 @Injectable()
 export class UserService {
@@ -53,6 +55,19 @@ export class UserService {
       // TODO: err also returns pwd hash :)
       throw new ConflictException(err);
     }
+  }
+
+  public async updatePassword(
+    userId: number,
+    passwordHash: string,
+  ): Promise<void> {
+    const userEntity = await this.userRepository.findOne(userId);
+    if (isNullOrUndefined(userEntity)) {
+      throw new NotFoundException();
+    }
+
+    userEntity.passwordHash = passwordHash;
+    await this.userRepository.update(userEntity.id, userEntity);
   }
 
   public async updateUser(userEntity: User): Promise<void> {

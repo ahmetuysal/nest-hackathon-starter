@@ -5,7 +5,11 @@ import {
   NotFoundException,
   ConflictException,
 } from '@nestjs/common';
-import { SignupRequest, ChangeEmailRequest } from '../contract';
+import {
+  SignupRequest,
+  ChangeEmailRequest,
+  ResetPasswordRequest,
+} from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from './jwt-payload.interface';
@@ -20,6 +24,7 @@ import { MailSenderService } from '../mail-sender/mail-sender.service';
 import 'nanoid';
 import nanoid = require('nanoid');
 import { EmailChange } from './email-change.entity';
+import { PasswordReset } from './password-reset.entity';
 
 @Injectable()
 export class AuthService {
@@ -28,6 +33,8 @@ export class AuthService {
     private readonly emailVerificationRepository: Repository<EmailVerification>,
     @InjectRepository(EmailChange)
     private readonly emailChangeRepository: Repository<EmailChange>,
+    @InjectRepository(PasswordReset)
+    private readonly passwordResetRepository: Repository<PasswordReset>,
     private readonly mailSenderService: MailSenderService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
@@ -157,6 +164,60 @@ export class AuthService {
       userEntity.email = emailChange.newEmail;
       await this.userService.updateUser(userEntity);
       await this.emailChangeRepository.delete(emailChange);
+    } else {
+      throw new NotFoundException();
+    }
+  }
+
+  async sendResetPasswordMail(email: string): Promise<void> {
+    const userEntity = await this.userService.getUserEntityByUsername(email);
+    if (isNullOrUndefined(userEntity)) {
+      throw new NotFoundException();
+    }
+
+    const userId = userEntity.id;
+    // Invalidate old token if exists
+    const oldResetPasswordEntity = await this.passwordResetRepository.findOne({
+      userId,
+    });
+    if (oldResetPasswordEntity !== undefined) {
+      await this.passwordResetRepository.delete(oldResetPasswordEntity);
+    }
+
+    const token = nanoid();
+    const passwordReset = new PasswordReset();
+    passwordReset.token = token;
+    passwordReset.userId = userId;
+    // valid for 2 days
+    const twoDaysLater = new Date();
+    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
+    passwordReset.validUntil = twoDaysLater;
+    try {
+      this.emailChangeRepository.insert(passwordReset);
+    } catch (err) {
+      throw new InternalServerErrorException(err);
+    }
+
+    this.mailSenderService.sendResetPasswordMail(
+      userEntity.firstName,
+      userEntity.email,
+      token,
+    );
+  }
+
+  async resetPassword(
+    resetPasswordRequest: ResetPasswordRequest,
+  ): Promise<void> {
+    const passwordResetEntity = await this.passwordResetRepository.findOne(
+      resetPasswordRequest.token,
+    );
+
+    if (passwordResetEntity && passwordResetEntity.validUntil > new Date()) {
+      await this.userService.updatePassword(
+        passwordResetEntity.userId,
+        await bcrypt.hash(resetPasswordRequest.newPassword, 10),
+      );
+      await this.passwordResetRepository.delete(passwordResetEntity);
     } else {
       throw new NotFoundException();
     }
