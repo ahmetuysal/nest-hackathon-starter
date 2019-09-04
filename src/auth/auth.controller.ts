@@ -6,6 +6,7 @@ import {
   Get,
   UseGuards,
   Param,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   SignupRequest,
@@ -29,33 +30,34 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
-  @HttpCode(201)
+  @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupRequest: SignupRequest): Promise<void> {
     await this.authService.signup(signupRequest);
   }
 
   @Post('login')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async login(@Body() loginRequest: LoginRequest): Promise<LoginResponse> {
     return new LoginResponse(await this.authService.login(loginRequest));
   }
 
   @ApiBearerAuth()
   @Get()
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async getUserWithToken(@Usr() user: User): Promise<GetResponse<IUser>> {
     return new GetResponse<IUser>(toUserModel(user));
   }
 
   @Get('verify')
+  @HttpCode(HttpStatus.OK)
   async verifyMail(@Param('token') token: string): Promise<void> {
     await this.authService.verifyEmail(token);
   }
 
   @ApiBearerAuth()
   @Post('change-email')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async sendChangeEmailMail(
     @Usr() user: User,
@@ -70,18 +72,19 @@ export class AuthController {
   }
 
   @Get('change-email')
+  @HttpCode(HttpStatus.OK)
   async changeEmail(@Param('token') token: string): Promise<void> {
     await this.authService.changeEmail(token);
   }
 
   @Post('forgot-password/:email')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async sendResetPassword(@Param('email') email: string): Promise<void> {
     await this.authService.sendResetPasswordMail(email);
   }
 
   @Post('reset-password')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async resetPassword(
     @Body() resetPasswordRequest: ResetPasswordRequest,
   ): Promise<void> {
@@ -89,7 +92,7 @@ export class AuthController {
   }
 
   @Post('resend-verification')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async resendVerificationMail(@Usr() user: User): Promise<void> {
     await this.authService.resendVerificationMail(
