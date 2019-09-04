@@ -14,15 +14,19 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 3. **Mail Verification**
 
-4. **Password Reset (TODO)**
+4. **Mail Change**
 
-5. **Customizable Mail Templates**
+5. **Password Reset**
 
-6. **Swagger API Documentation**
+6. **Request Validation**
 
-7. **Security Techniques (TODO)**
+7. **Customizable Mail Templates**
 
-8. **Logger (TODO)**
+8. **Swagger API Documentation**
+
+9. **Security Techniques (TODO)**
+
+10. **Logger (TODO)**
 
 ## Getting Started
 
@@ -125,7 +129,9 @@ Mail templates are highly customizable and heavily depend on configurations. Ent
       ['__Social_Media_2__', '__Social_Media_2_URL__'],
     ],
     url: 'http://localhost:4200',
-    mailVerificationUrl: 'http://localhost:4200/signup/validate',
+    mailVerificationUrl: 'http://localhost:3000/auth/verify',
+    mailChangeUrl: 'http://localhost:3000/auth/change-email',
+    resetPasswordUrl: 'http://localhost:4200/reset-password',
     termsOfServiceUrl: 'http://localhost:4200/legal/terms',
   },
 ```
