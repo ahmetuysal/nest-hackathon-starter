@@ -4,6 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   ConflictException,
+  Logger,
 } from '@nestjs/common';
 import {
   SignupRequest,
@@ -60,6 +61,7 @@ export class AuthService {
     try {
       this.emailVerificationRepository.insert(emailVerification);
     } catch (err) {
+      Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
     }
 
@@ -80,6 +82,9 @@ export class AuthService {
     });
 
     if (isNullOrUndefined(emailVerification)) {
+      Logger.log(
+        `User with id ${userId} called resend verification without a valid email verification`,
+      );
       throw new NotFoundException();
     }
 
@@ -113,6 +118,7 @@ export class AuthService {
       await this.userService.updateUser(userEntity);
       await this.emailVerificationRepository.delete(emailVerification);
     } else {
+      Logger.log(`Verify email called with invalid email token ${token}`);
       throw new NotFoundException();
     }
   }
@@ -128,6 +134,11 @@ export class AuthService {
       changeEmailRequest.newEmail,
     );
     if (userEntity !== undefined) {
+      Logger.log(
+        `User with id ${userId} tried to change its email to already used ${
+          changeEmailRequest.newEmail
+        }`,
+      );
       throw new ConflictException();
     }
 
@@ -137,6 +148,9 @@ export class AuthService {
     });
     if (oldEmailChangeEntity !== undefined) {
       await this.emailChangeRepository.delete(oldEmailChangeEntity);
+      Logger.log(
+        `Email change token ${oldEmailChangeEntity.token} is invalidated`,
+      );
     }
 
     const token = nanoid();
@@ -150,6 +164,7 @@ export class AuthService {
     try {
       this.emailChangeRepository.insert(emailChange);
     } catch (err) {
+      Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
     }
 
@@ -166,6 +181,7 @@ export class AuthService {
       await this.userService.updateUser(userEntity);
       await this.emailChangeRepository.delete(emailChange);
     } else {
+      Logger.log(`Invalid email change token ${token} is rejected.`);
       throw new NotFoundException();
     }
   }
@@ -183,8 +199,10 @@ export class AuthService {
     });
     if (oldResetPasswordEntity !== undefined) {
       await this.passwordResetRepository.delete(oldResetPasswordEntity);
+      Logger.log(
+        `Password reset token ${oldResetPasswordEntity.token} is invalidated`,
+      );
     }
-
     const token = nanoid();
     const passwordReset = new PasswordReset();
     passwordReset.token = token;
@@ -196,6 +214,7 @@ export class AuthService {
     try {
       this.emailChangeRepository.insert(passwordReset);
     } catch (err) {
+      Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
     }
 
@@ -220,6 +239,11 @@ export class AuthService {
       );
       await this.passwordResetRepository.delete(passwordResetEntity);
     } else {
+      Logger.log(
+        `Invalid reset password token ${
+          resetPasswordRequest.newPassword
+        } is rejected`,
+      );
       throw new NotFoundException();
     }
   }

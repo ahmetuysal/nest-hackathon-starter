@@ -26,7 +26,7 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 9. **Security Techniques (TODO)**
 
-10. **Logger (TODO)**
+10. **Logger**
 
 ## Getting Started
 

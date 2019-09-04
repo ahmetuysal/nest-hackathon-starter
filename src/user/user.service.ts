@@ -3,6 +3,7 @@ import {
   ConflictException,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
@@ -52,8 +53,8 @@ export class UserService {
       await this.userRepository.insert(newUser);
       return newUser;
     } catch (err) {
-      // TODO: err also returns pwd hash :)
-      throw new ConflictException(err);
+      Logger.error(JSON.stringify(err));
+      throw new ConflictException();
     }
   }
 
@@ -63,6 +64,9 @@ export class UserService {
   ): Promise<void> {
     const userEntity = await this.userRepository.findOne(userId);
     if (isNullOrUndefined(userEntity)) {
+      Logger.warn(
+        `Password chage of non-existend account with id ${userId} is rejected.`,
+      );
       throw new NotFoundException();
     }
 
@@ -76,7 +80,8 @@ export class UserService {
     try {
       await this.userRepository.update(userEntity.id, userEntity);
     } catch (err) {
-      throw new BadRequestException(err);
+      Logger.warn(JSON.stringify(err));
+      throw new BadRequestException();
     }
   }
 }

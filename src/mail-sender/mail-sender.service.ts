@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { default as config } from '../config';
 import {
@@ -46,8 +46,7 @@ export class MailSenderService {
     const sended = await new Promise<boolean>(async (resolve, reject) => {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
-          // TODO: change this with logger
-          console.log('Mail sending failed, check your service credentials.');
+          Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
         }
         resolve(true);
@@ -90,8 +89,7 @@ export class MailSenderService {
     const sended = await new Promise<boolean>(async (resolve, reject) => {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
-          // TODO: change this with logger
-          console.log('Mail sending failed, check your service credentials.');
+          Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
         }
         resolve(true);
@@ -134,8 +132,7 @@ export class MailSenderService {
     const sended = await new Promise<boolean>(async (resolve, reject) => {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
-          // TODO: change this with logger
-          console.log('Mail sending failed, check your service credentials.');
+          Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
         }
         resolve(true);
@@ -172,8 +169,7 @@ export class MailSenderService {
     const sended = await new Promise<boolean>(async (resolve, reject) => {
       return await transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
-          // TODO: change this with logger
-          console.log('Mail sending failed, check your service credentials.');
+          Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
         }
         resolve(true);
