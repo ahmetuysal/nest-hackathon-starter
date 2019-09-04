@@ -24,7 +24,7 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 8. **Swagger API Documentation**
 
-9. **Security Techniques (TODO)**
+9. **Security Techniques**
 
 10. **Logger**
 
