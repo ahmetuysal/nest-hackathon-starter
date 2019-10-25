@@ -12,8 +12,7 @@ import {
   SignupRequest,
   LoginRequest,
   LoginResponse,
-  GetResponse,
-  User as IUser,
+  GetUserResponse,
   ChangeEmailRequest,
   ResetPasswordRequest,
   ChangePasswordRequest,
@@ -46,8 +45,8 @@ export class AuthController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
-  async getUserWithToken(@Usr() user: User): Promise<GetResponse<IUser>> {
-    return new GetResponse<IUser>(toUserModel(user));
+  async getUserWithToken(@Usr() user: User): Promise<GetUserResponse> {
+    return new GetUserResponse(toUserModel(user));
   }
 
   @Get('verify')
