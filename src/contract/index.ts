@@ -7,6 +7,7 @@ export { CheckUsernameRequest } from './request/check-username-request.model';
 export { LoginRequest } from './request/login-request.model';
 export { ResetPasswordRequest } from './request/reset-password-request.model';
 export { SignupRequest } from './request/signup-request.model';
+export { UpdateUserRequest } from './request/update-user-request.model';
 
 export { CheckEmailResponse } from './response/check-email-response.model';
 export {
