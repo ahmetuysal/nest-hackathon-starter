@@ -18,6 +18,8 @@ import {
   ChangePasswordRequest,
   CheckUsernameRequest,
   CheckUsernameResponse,
+  CheckEmailRequest,
+  CheckEmailResponse,
 } from '../contract';
 import { AuthService } from './auth.service';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -37,6 +39,14 @@ export class AuthController {
     @Body() checkUsernameRequest: CheckUsernameRequest,
   ): Promise<CheckUsernameResponse> {
     return await this.authService.checkUsername(checkUsernameRequest);
+  }
+
+  @Post('check-email')
+  @HttpCode(200)
+  async checkEmailAvailability(
+    @Body() checkEmailRequest: CheckEmailRequest,
+  ): Promise<CheckEmailResponse> {
+    return await this.authService.checkEmail(checkEmailRequest);
   }
 
   @Post('signup')

@@ -28,6 +28,11 @@ export class UserService {
     return await this.userRepository.findOne({ where: { username } });
   }
 
+  public async getUserEntityByEmail(email: string): Promise<User> {
+    email = email.toLowerCase();
+    return await this.userRepository.findOne({ where: { email } });
+  }
+
   public async getUserEntityByUsernameOrEmail(
     identifier: string,
   ): Promise<User> {

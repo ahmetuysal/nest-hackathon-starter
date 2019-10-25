@@ -13,6 +13,8 @@ import {
   ChangePasswordRequest,
   CheckUsernameRequest,
   CheckUsernameResponse,
+  CheckEmailRequest,
+  CheckEmailResponse,
 } from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -305,5 +307,14 @@ export class AuthService {
       checkUsernameRequest.username,
     );
     return new CheckUsernameResponse(isNullOrUndefined(userEntity));
+  }
+
+  async checkEmail(
+    checkEmailRequest: CheckEmailRequest,
+  ): Promise<CheckEmailResponse> {
+    const userEntity = await this.userService.getUserEntityByEmail(
+      checkEmailRequest.email,
+    );
+    return new CheckEmailResponse(isNullOrUndefined(userEntity));
   }
 }
