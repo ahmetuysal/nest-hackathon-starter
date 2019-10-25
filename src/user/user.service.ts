@@ -6,6 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { validate } from 'class-validator';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { SignupRequest } from '../contract';
@@ -76,12 +77,21 @@ export class UserService {
 
   public async updateUser(userEntity: User): Promise<void> {
     // TODO: Email update should be seperated
-    // TODO: Add validation
+    this.validateUser(userEntity);
     try {
       await this.userRepository.update(userEntity.id, userEntity);
     } catch (err) {
       Logger.warn(JSON.stringify(err));
       throw new BadRequestException();
+    }
+  }
+
+  private async validateUser(user: User): Promise<void> {
+    const errors = await validate(user, {
+      validationError: { target: false },
+    });
+    if (errors.length > 0) {
+      throw new BadRequestException(errors);
     }
   }
 }
