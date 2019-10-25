@@ -16,6 +16,8 @@ import {
   ChangeEmailRequest,
   ResetPasswordRequest,
   ChangePasswordRequest,
+  CheckUsernameRequest,
+  CheckUsernameResponse,
 } from '../contract';
 import { AuthService } from './auth.service';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
@@ -28,6 +30,14 @@ import { toUserModel } from '../user/user.mapper';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  @Post('check-username')
+  @HttpCode(200)
+  async checkUsernameAvailability(
+    @Body() checkUsernameRequest: CheckUsernameRequest,
+  ): Promise<CheckUsernameResponse> {
+    return await this.authService.checkUsername(checkUsernameRequest);
+  }
 
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)

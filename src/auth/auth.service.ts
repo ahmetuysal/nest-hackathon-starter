@@ -11,6 +11,8 @@ import {
   ChangeEmailRequest,
   ResetPasswordRequest,
   ChangePasswordRequest,
+  CheckUsernameRequest,
+  CheckUsernameResponse,
 } from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
@@ -294,5 +296,14 @@ export class AuthService {
     };
 
     return await this.jwtService.signAsync(payload);
+  }
+
+  async checkUsername(
+    checkUsernameRequest: CheckUsernameRequest,
+  ): Promise<CheckUsernameResponse> {
+    const userEntity = await this.userService.getUserEntityByUsername(
+      checkUsernameRequest.username,
+    );
+    return new CheckUsernameResponse(isNullOrUndefined(userEntity));
   }
 }
