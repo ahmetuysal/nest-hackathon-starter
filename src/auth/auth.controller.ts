@@ -7,6 +7,7 @@ import {
   UseGuards,
   Param,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import {
   SignupRequest,
@@ -34,7 +35,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('check-username')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async checkUsernameAvailability(
     @Body() checkUsernameRequest: CheckUsernameRequest,
   ): Promise<CheckUsernameResponse> {
@@ -42,7 +43,7 @@ export class AuthController {
   }
 
   @Post('check-email')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   async checkEmailAvailability(
     @Body() checkEmailRequest: CheckEmailRequest,
   ): Promise<CheckEmailResponse> {
@@ -71,7 +72,7 @@ export class AuthController {
 
   @Get('verify')
   @HttpCode(HttpStatus.OK)
-  async verifyMail(@Param('token') token: string): Promise<void> {
+  async verifyMail(@Query('token') token: string): Promise<void> {
     await this.authService.verifyEmail(token);
   }
 

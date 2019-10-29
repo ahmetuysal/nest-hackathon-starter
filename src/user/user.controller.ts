@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Body,
   UnauthorizedException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -23,7 +24,7 @@ export class UserController {
 
   @ApiBearerAuth()
   @Put(':id')
-  @HttpCode(200)
+  @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
