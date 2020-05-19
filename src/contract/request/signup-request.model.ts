@@ -1,12 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import {
-  IsNotEmpty,
-  IsEmail,
-  Matches,
-  MaxLength,
-  MinLength,
-  IsOptional,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class SignupRequest {
   @ApiModelProperty()

@@ -1,29 +1,19 @@
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
 import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  Get,
-  UseGuards,
-  Param,
-  HttpStatus,
-  Query,
-} from '@nestjs/common';
-import {
-  SignupRequest,
-  LoginRequest,
-  LoginResponse,
-  GetUserResponse,
   ChangeEmailRequest,
-  ResetPasswordRequest,
   ChangePasswordRequest,
-  CheckUsernameRequest,
-  CheckUsernameResponse,
   CheckEmailRequest,
   CheckEmailResponse,
+  CheckUsernameRequest,
+  CheckUsernameResponse,
+  GetUserResponse,
+  LoginRequest,
+  LoginResponse,
+  ResetPasswordRequest,
+  SignupRequest,
 } from '../contract';
 import { AuthService } from './auth.service';
-import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Usr } from '../user/user.decorator';
 import { User } from '../user/user.entity';
@@ -32,7 +22,8 @@ import { toUserModel } from '../user/user.mapper';
 @ApiUseTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {
+  }
 
   @Post('check-username')
   @HttpCode(HttpStatus.OK)

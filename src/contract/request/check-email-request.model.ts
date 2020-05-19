@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsEmail } from 'class-validator';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
 export class CheckEmailRequest {
   @ApiModelProperty()

@@ -1,3 +1,4 @@
 export class CheckUsernameResponse {
-  constructor(public isUsernameAvailable: boolean) {}
+  constructor(public isUsernameAvailable: boolean) {
+  }
 }

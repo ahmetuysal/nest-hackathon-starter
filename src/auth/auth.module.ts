@@ -34,4 +34,5 @@ import { PasswordReset } from './password-reset.entity';
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 })
-export class AuthModule {}
+export class AuthModule {
+}

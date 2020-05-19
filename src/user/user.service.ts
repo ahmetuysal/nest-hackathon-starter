@@ -1,23 +1,17 @@
-import {
-  Injectable,
-  ConflictException,
-  BadRequestException,
-  NotFoundException,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { validate } from 'class-validator';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { SignupRequest } from '../contract';
-import { isNullOrUndefined } from 'util';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) {
+  }
 
   public async getUserEntityById(id: number): Promise<User> {
     return await this.userRepository.findOne(id);
@@ -69,9 +63,9 @@ export class UserService {
     passwordHash: string,
   ): Promise<void> {
     const userEntity = await this.userRepository.findOne(userId);
-    if (isNullOrUndefined(userEntity)) {
+    if (userEntity === null || userEntity === undefined) {
       Logger.warn(
-        `Password chage of non-existend account with id ${userId} is rejected.`,
+        `Password change of non-existent account with id ${userId} is rejected.`,
       );
       throw new NotFoundException();
     }
@@ -81,8 +75,8 @@ export class UserService {
   }
 
   public async updateUser(userEntity: User): Promise<void> {
-    // TODO: Email update should be seperated
-    this.validateUser(userEntity);
+    // TODO: Email update should be separated
+    await UserService.validateUser(userEntity);
     try {
       await this.userRepository.update(userEntity.id, userEntity);
     } catch (err) {
@@ -91,7 +85,7 @@ export class UserService {
     }
   }
 
-  private async validateUser(user: User): Promise<void> {
+  private static async validateUser(user: User): Promise<void> {
     const errors = await validate(user, {
       validationError: { target: false },
     });

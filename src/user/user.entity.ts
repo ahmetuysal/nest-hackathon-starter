@@ -1,15 +1,7 @@
 import { User as IUser } from '../contract';
-import { Entity, Unique, Index, PrimaryGeneratedColumn, Column } from 'typeorm';
-import {
-  IsBoolean,
-  IsEmail,
-  IsLowercase,
-  IsNotEmpty,
-  IsOptional,
-  IsUrl,
-  MaxLength,
-  Matches,
-} from 'class-validator';
+import { Column, Entity, Index, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { IsBoolean, IsEmail, IsLowercase, IsNotEmpty, IsOptional, IsUrl, Matches, MaxLength } from 'class-validator';
+
 @Entity('user')
 @Unique('unique_user_username', ['username'])
 @Unique('unique_user_email', ['email'])

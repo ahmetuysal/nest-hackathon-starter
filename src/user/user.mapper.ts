@@ -1,9 +1,8 @@
 import { User as IUser } from '../contract';
 import { User } from './user.entity';
-import { isNullOrUndefined } from 'util';
 
 export function toUserEntity(userModel: IUser): User {
-  if (isNullOrUndefined(userModel)) {
+  if (userModel === null || userModel === undefined) {
     return null;
   }
   const userEntity = new User();
@@ -21,7 +20,7 @@ export function toUserEntity(userModel: IUser): User {
 }
 
 export function toUserModel(userEntity: User): IUser {
-  if (isNullOrUndefined(userEntity)) {
+  if (userEntity === null || userEntity === undefined) {
     return null;
   }
   const userModel = new User();

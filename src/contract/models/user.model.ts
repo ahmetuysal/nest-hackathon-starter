@@ -1,13 +1,4 @@
-import {
-  IsOptional,
-  IsNumber,
-  IsNotEmpty,
-  Matches,
-  MaxLength,
-  IsEmail,
-  IsBoolean,
-  IsUrl,
-} from 'class-validator';
+import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsUrl, Matches, MaxLength } from 'class-validator';
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 
 export class User {

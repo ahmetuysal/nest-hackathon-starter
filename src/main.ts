@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as helmet from 'helmet';
@@ -47,4 +47,5 @@ async function bootstrap() {
 
   await app.listen(3000);
 }
+
 bootstrap();

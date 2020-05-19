@@ -1,15 +1,15 @@
 import {
+  Body,
   Controller,
-  Put,
   HttpCode,
-  UseGuards,
+  HttpStatus,
   Param,
   ParseIntPipe,
-  Body,
+  Put,
   UnauthorizedException,
-  HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserRequest } from '../contract';
@@ -20,7 +20,8 @@ import { updateUserEntityFields } from './user.mapper';
 @ApiUseTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {
+  }
 
   @ApiBearerAuth()
   @Put(':id')

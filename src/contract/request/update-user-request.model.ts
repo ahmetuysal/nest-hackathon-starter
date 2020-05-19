@@ -1,7 +1,8 @@
-import { User } from '../models/user.model';
+import { User } from '..';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDefined, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+
 export class UpdateUserRequest {
   @ApiModelProperty()
   @IsDefined()

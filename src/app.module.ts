@@ -7,4 +7,5 @@ import { MailSenderModule } from './mail-sender/mail-sender.module';
 @Module({
   imports: [TypeOrmModule.forRoot(), UserModule, AuthModule, MailSenderModule],
 })
-export class AppModule {}
+export class AppModule {
+}

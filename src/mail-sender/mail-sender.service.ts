@@ -1,12 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { default as config } from '../config';
-import {
-  confirmMail,
-  changeMail,
-  resetPassword,
-  changePasswordInfo,
-} from './templates';
+import { changeMail, changePasswordInfo, confirmMail, resetPassword } from './templates';
 
 @Injectable()
 export class MailSenderService {
@@ -15,7 +10,7 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const transporter = this.createTransporter();
+    const transporter = MailSenderService.createTransporter();
     const socials = this.createSocials();
     const buttonLink = `${config.project.mailVerificationUrl}?token=${token}`;
 
@@ -43,8 +38,8 @@ export class MailSenderService {
       html: mail,
     };
 
-    const sended = await new Promise<boolean>(async (resolve, reject) => {
-      return await transporter.sendMail(mailOptions, async (error, info) => {
+    return await new Promise<boolean>(async (resolve, reject) => {
+      return transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
           Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
@@ -52,8 +47,6 @@ export class MailSenderService {
         resolve(true);
       });
     });
-
-    return sended;
   }
 
   async sendChangeEmailMail(
@@ -61,7 +54,7 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const transporter = this.createTransporter();
+    const transporter = MailSenderService.createTransporter();
     const socials = this.createSocials();
 
     const buttonLink = `${config.project.mailChangeUrl}?token=${token}`;
@@ -86,8 +79,8 @@ export class MailSenderService {
       html: mail,
     };
 
-    const sended = await new Promise<boolean>(async (resolve, reject) => {
-      return await transporter.sendMail(mailOptions, async (error, info) => {
+    return await new Promise<boolean>(async (resolve, reject) => {
+      return transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
           Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
@@ -95,8 +88,6 @@ export class MailSenderService {
         resolve(true);
       });
     });
-
-    return sended;
   }
 
   async sendResetPasswordMail(
@@ -104,7 +95,7 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const transporter = this.createTransporter();
+    const transporter = MailSenderService.createTransporter();
     const socials = this.createSocials();
 
     const buttonLink = `${config.project.resetPasswordUrl}?token=${token}`;
@@ -129,8 +120,8 @@ export class MailSenderService {
       html: mail,
     };
 
-    const sended = await new Promise<boolean>(async (resolve, reject) => {
-      return await transporter.sendMail(mailOptions, async (error, info) => {
+    return await new Promise<boolean>(async (resolve, reject) => {
+      return transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
           Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
@@ -138,12 +129,10 @@ export class MailSenderService {
         resolve(true);
       });
     });
-
-    return sended;
   }
 
   async sendPasswordChangeInfoMail(name: string, email: string) {
-    const transporter = this.createTransporter();
+    const transporter = MailSenderService.createTransporter();
     const socials = this.createSocials();
     const buttonLink = config.project.url;
     const mail = changePasswordInfo
@@ -166,8 +155,8 @@ export class MailSenderService {
       html: mail,
     };
 
-    const sended = await new Promise<boolean>(async (resolve, reject) => {
-      return await transporter.sendMail(mailOptions, async (error, info) => {
+    return await new Promise<boolean>(async (resolve, reject) => {
+      return transporter.sendMail(mailOptions, async (error, info) => {
         if (error) {
           Logger.warn('Mail sending failed, check your service credentials.');
           resolve(false);
@@ -175,11 +164,9 @@ export class MailSenderService {
         resolve(true);
       });
     });
-
-    return sended;
   }
 
-  private createTransporter() {
+  private static createTransporter() {
     return nodemailer.createTransport({
       auth: {
         user: config.mail.service.user,

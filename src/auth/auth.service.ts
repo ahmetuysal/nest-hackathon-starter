@@ -1,36 +1,35 @@
 import {
-  Injectable,
-  UnauthorizedException,
-  InternalServerErrorException,
-  NotFoundException,
   ConflictException,
+  Injectable,
+  InternalServerErrorException,
   Logger,
+  NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
-  SignupRequest,
   ChangeEmailRequest,
-  ResetPasswordRequest,
   ChangePasswordRequest,
-  CheckUsernameRequest,
-  CheckUsernameResponse,
   CheckEmailRequest,
   CheckEmailResponse,
+  CheckUsernameRequest,
+  CheckUsernameResponse,
+  LoginRequest,
+  ResetPasswordRequest,
+  SignupRequest,
 } from '../contract';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtPayload } from './jwt-payload.interface';
 import { User } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
-import { LoginRequest } from '../contract';
-import { isNullOrUndefined } from 'util';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmailVerification } from './email-verification.entity';
 import { Repository } from 'typeorm';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import 'nanoid';
-import nanoid = require('nanoid');
 import { EmailChange } from './email-change.entity';
 import { PasswordReset } from './password-reset.entity';
+import nanoid = require('nanoid');
 
 @Injectable()
 export class AuthService {
@@ -44,7 +43,8 @@ export class AuthService {
     private readonly mailSenderService: MailSenderService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) {
+  }
 
   async signup(signupRequest: SignupRequest): Promise<void> {
     const createdUser = await this.userService.createUser(
@@ -63,7 +63,7 @@ export class AuthService {
     emailVerification.validUntil = twoDaysLater;
 
     try {
-      this.emailVerificationRepository.insert(emailVerification);
+      await this.emailVerificationRepository.insert(emailVerification);
     } catch (err) {
       Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
@@ -85,7 +85,7 @@ export class AuthService {
       where: { userId },
     });
 
-    if (isNullOrUndefined(emailVerification)) {
+    if (emailVerification === null || emailVerification === undefined) {
       Logger.log(
         `User with id ${userId} called resend verification without a valid email verification`,
       );
@@ -166,7 +166,7 @@ export class AuthService {
     twoDaysLater.setDate(twoDaysLater.getDate() + 2);
     emailChange.validUntil = twoDaysLater;
     try {
-      this.emailChangeRepository.insert(emailChange);
+      await this.emailChangeRepository.insert(emailChange);
     } catch (err) {
       Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
@@ -192,7 +192,7 @@ export class AuthService {
 
   async sendResetPasswordMail(email: string): Promise<void> {
     const userEntity = await this.userService.getUserEntityByUsername(email);
-    if (isNullOrUndefined(userEntity)) {
+    if (userEntity === null || userEntity === undefined) {
       throw new NotFoundException();
     }
 
@@ -216,13 +216,13 @@ export class AuthService {
     twoDaysLater.setDate(twoDaysLater.getDate() + 2);
     passwordReset.validUntil = twoDaysLater;
     try {
-      this.emailChangeRepository.insert(passwordReset);
+      await this.emailChangeRepository.insert(passwordReset);
     } catch (err) {
       Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
     }
 
-    this.mailSenderService.sendResetPasswordMail(
+    await this.mailSenderService.sendResetPasswordMail(
       userEntity.firstName,
       userEntity.email,
       token,
@@ -285,7 +285,7 @@ export class AuthService {
     );
 
     if (
-      isNullOrUndefined(userEntity) ||
+      userEntity === null || userEntity === undefined ||
       !bcrypt.compareSync(loginRequest.password, userEntity.passwordHash)
     ) {
       throw new UnauthorizedException();
@@ -306,7 +306,7 @@ export class AuthService {
     const userEntity = await this.userService.getUserEntityByUsername(
       checkUsernameRequest.username,
     );
-    return new CheckUsernameResponse(isNullOrUndefined(userEntity));
+    return new CheckUsernameResponse(userEntity === null || userEntity === undefined);
   }
 
   async checkEmail(
@@ -315,6 +315,6 @@ export class AuthService {
     const userEntity = await this.userService.getUserEntityByEmail(
       checkEmailRequest.email,
     );
-    return new CheckEmailResponse(isNullOrUndefined(userEntity));
+    return new CheckEmailResponse(userEntity === null || userEntity === undefined);
   }
 }

@@ -4,7 +4,7 @@ import { IsNotEmpty, MinLength } from 'class-validator';
 export class LoginRequest {
   @ApiModelProperty()
   @IsNotEmpty()
-  // username or email
+    // username or email
   identifier: string;
 
   @ApiModelProperty()
