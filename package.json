@@ -2,6 +2,10 @@
   "name": "nest-hackathon-starter",
   "version": "0.1.0",
   "description": "Hackathon starter project for NestJS.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ahmetuysal/nest-hackathon-starter"
+  },
   "author": "Ahmet Uysal",
   "license": "MIT",
   "scripts": {
