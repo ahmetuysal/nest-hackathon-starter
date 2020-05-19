@@ -1,4 +1,4 @@
-import { createParamDecorator } from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 /**
  * retrieve the current user with a decorator
@@ -8,4 +8,11 @@ import { createParamDecorator } from '@nestjs/common';
  *   // do something with the user
  * }
  */
-export const Usr = createParamDecorator((data, req) => req.user);
+export const Usr = createParamDecorator(
+  (data: string, ctx: ExecutionContext) => {
+    const request = ctx.switchToHttp().getRequest();
+    const user = request.user;
+
+    return data ? user && user[data] : user;
+  },
+);

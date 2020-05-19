@@ -1,8 +1,8 @@
 {
   "name": "nest-hackathon-starter",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "version": "0.1.0",
+  "description": "Hackathon starter project for NestJS.",
+  "author": "Ahmet Uysal",
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
