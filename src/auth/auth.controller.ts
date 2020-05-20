@@ -13,13 +13,13 @@ import {
   SignupRequest,
 } from '../contract';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Usr } from '../user/user.decorator';
 import { User } from '../user/user.entity';
 import { toUserModel } from '../user/user.mapper';
 
-@ApiUseTags('auth')
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {

@@ -9,7 +9,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiUseTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateUserRequest } from '../contract';
@@ -17,7 +17,7 @@ import { User } from './user.entity';
 import { Usr } from './user.decorator';
 import { updateUserEntityFields } from './user.mapper';
 
-@ApiUseTags('users')
+@ApiTags('users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {

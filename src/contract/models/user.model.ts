@@ -1,55 +1,55 @@
 import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsUrl, Matches, MaxLength } from 'class-validator';
-import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class User {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNumber()
   id?: number;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @Matches(RegExp('^[a-zA-Z0-9\\-]+$'))
   @MaxLength(20)
   username?: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsEmail()
   email?: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsBoolean()
   emailVerified?: boolean;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @Matches(RegExp('^[A-Za-zıöüçğşİÖÜÇĞŞñÑáéíóúÁÉÍÓÚ]+$'))
   @MaxLength(20)
   firstName?: string;
 
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @Matches(RegExp('^[A-Za-zıöüçğşİÖÜÇĞŞñÑáéíóúÁÉÍÓÚ ]+$'))
   @MaxLength(40)
   lastName?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsNotEmpty()
   @MaxLength(40)
   @Matches(RegExp('^[A-Za-zıöüçğşİÖÜÇĞŞñÑáéíóúÁÉÍÓÚ ]+$'))
   middleName?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsOptional()
   @IsUrl()
   image?: string;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsOptional()
   @Matches(RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))'))
   birthDate?: Date;
 
-  @ApiModelPropertyOptional()
+  @ApiPropertyOptional()
   @IsOptional()
   @Matches(RegExp('([12]\\d{3}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01]))'))
   registrationDate?: Date;

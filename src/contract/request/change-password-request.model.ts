@@ -1,8 +1,8 @@
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, MinLength } from 'class-validator';
 
 export class ChangePasswordRequest {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsNotEmpty()
   @MinLength(8)
   newPassword: string;

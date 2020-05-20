@@ -1,10 +1,10 @@
 import { User } from '..';
-import { ApiModelProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsDefined, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class UpdateUserRequest {
-  @ApiModelProperty()
+  @ApiProperty()
   @IsDefined()
   @ValidateNested()
   @Type(() => User)
