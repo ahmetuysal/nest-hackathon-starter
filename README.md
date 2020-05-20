@@ -56,13 +56,10 @@ default:
   synchronize: true
   logging: true
   entities:
-    - src/**/*.entity.ts
     - dist/**/*.entity.js
   migrations:
-    - database/migrations/**/*.ts
     - dist/database/migrations/**/*.js
   subscribers:
-    - database/subscriber/**/*.ts
     - dist/database/subscriber/**/.js
   cli:
     entitiesDir: src
@@ -139,14 +136,7 @@ Mail templates are highly customizable and heavily depend on configurations. Ent
 ### Running the app
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+$ nest start
 ```
 
 ### Running the tests

@@ -1,4 +1,7 @@
 export class CheckEmailResponse {
-  constructor(public isEmailAvailable: boolean) {
+  isEmailAvailable: boolean;
+
+  constructor(isEmailAvailable: boolean) {
+    this.isEmailAvailable = isEmailAvailable;
   }
 }

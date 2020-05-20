@@ -1,6 +1,9 @@
 import { User } from '..';
 
 export class GetUserResponse {
-  constructor(public user: User) {
+  user: User;
+
+  constructor(user: User) {
+    this.user = user;
   }
 }

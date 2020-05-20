@@ -1,4 +1,7 @@
 export class CheckUsernameResponse {
-  constructor(public isUsernameAvailable: boolean) {
+  isUsernameAvailable: boolean;
+
+  constructor(isUsernameAvailable: boolean) {
+    this.isUsernameAvailable = isUsernameAvailable;
   }
 }
