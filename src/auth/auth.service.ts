@@ -26,10 +26,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { EmailVerification } from './email-verification.entity';
 import { Repository } from 'typeorm';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
-import 'nanoid';
 import { EmailChange } from './email-change.entity';
 import { PasswordReset } from './password-reset.entity';
-import nanoid = require('nanoid');
+import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
