@@ -2,9 +2,9 @@ default:
   type: postgres
   host: localhost
   port: 5432
-  username: __YOUR_USERNAME__
-  password: __YOUR_PASSWORD__
-  database: __YOUR_DATABASE__
+  username: test
+  password: test
+  database: starter
   synchronize: true
   logging: true
   entities:

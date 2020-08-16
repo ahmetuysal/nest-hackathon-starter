@@ -35,7 +35,7 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 1. Make sure that you have [Node.js](https://nodejs.org)(>= 8.9.0) installed.
 2. Clone this repository by running `git clone https://github.com/ahmetuysal/nest-hackathon-starter.git <YOUR_PROJECT_NAME>` or [directly create your own GitHub repository using this template](https://github.com/ahmetuysal/nest-hackathon-starter/generate).
 3. Move to the appropriate directory: `cd <YOUR_PROJECT_NAME>`.
-4. Run `npm install` to install dependencies.
+4. Run `yarn` to install dependencies.
 
 ### Configuration Files
 
@@ -143,13 +143,13 @@ $ nest start
 
 ```bash
 # unit tests
-$ npm run test
+$ yarn run test
 
 # e2e tests
-$ npm run test:e2e
+$ yarn run test:e2e
 
 # test coverage
-$ npm run test:cov
+$ yarn run test:cov
 ```
 
 ## Support Nest
