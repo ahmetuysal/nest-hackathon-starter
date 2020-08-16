@@ -7,7 +7,7 @@ import { EmailChange } from './email-change.entity';
 import { PasswordReset } from './password-reset.entity';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { UserService } from '../user/user.service';
-import { default as config } from '../config';
+import config from '../config';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -63,5 +63,11 @@ describe('AuthService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+    expect(spyMailSenderService).toBeDefined();
+    expect(spyUserService).toBeDefined();
+    expect(spyJwtService).toBeDefined();
+    expect(spyEmailVerificationRepository).toBeDefined();
+    expect(spyEmailChangeRepository).toBeDefined();
+    expect(spyPasswordResetRepository).toBeDefined();
   });
 });

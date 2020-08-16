@@ -1,19 +1,18 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
-import { default as config } from '../config';
+import config from '../config';
 import {
   changeMail, changePasswordInfo, confirmMail, resetPassword,
 } from './templates';
 
-@Injectable()
 export class MailSenderService {
-  async sendVerifyEmailMail(
+  static async sendVerifyEmailMail(
     name: string,
     email: string,
     token: string,
   ): Promise<boolean> {
     const transporter = MailSenderService.createTransporter();
-    const socials = this.createSocials();
+    const socials = MailSenderService.createSocials();
     const buttonLink = `${config.project.mailVerificationUrl}?token=${token}`;
 
     const mail = confirmMail
@@ -40,7 +39,7 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+    return new Promise<boolean>((resolve) => transporter.sendMail(mailOptions, async (error) => {
       if (error) {
         Logger.warn('Mail sending failed, check your service credentials.');
         resolve(false);
@@ -49,13 +48,13 @@ export class MailSenderService {
     }));
   }
 
-  async sendChangeEmailMail(
+  static async sendChangeEmailMail(
     name: string,
     email: string,
     token: string,
   ): Promise<boolean> {
     const transporter = MailSenderService.createTransporter();
-    const socials = this.createSocials();
+    const socials = MailSenderService.createSocials();
 
     const buttonLink = `${config.project.mailChangeUrl}?token=${token}`;
 
@@ -79,7 +78,7 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+    return new Promise<boolean>((resolve) => transporter.sendMail(mailOptions, async (error) => {
       if (error) {
         Logger.warn('Mail sending failed, check your service credentials.');
         resolve(false);
@@ -88,13 +87,13 @@ export class MailSenderService {
     }));
   }
 
-  async sendResetPasswordMail(
+  static async sendResetPasswordMail(
     name: string,
     email: string,
     token: string,
   ): Promise<boolean> {
     const transporter = MailSenderService.createTransporter();
-    const socials = this.createSocials();
+    const socials = MailSenderService.createSocials();
 
     const buttonLink = `${config.project.resetPasswordUrl}?token=${token}`;
 
@@ -118,7 +117,7 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+    return new Promise<boolean>((resolve) => transporter.sendMail(mailOptions, async (error) => {
       if (error) {
         Logger.warn('Mail sending failed, check your service credentials.');
         resolve(false);
@@ -127,9 +126,9 @@ export class MailSenderService {
     }));
   }
 
-  async sendPasswordChangeInfoMail(name: string, email: string) {
+  static async sendPasswordChangeInfoMail(name: string, email: string):Promise<boolean> {
     const transporter = MailSenderService.createTransporter();
-    const socials = this.createSocials();
+    const socials = MailSenderService.createSocials();
     const buttonLink = config.project.url;
     const mail = changePasswordInfo
       .replace(new RegExp('--PersonName--', 'g'), name)
@@ -151,7 +150,7 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+    return new Promise<boolean>((resolve) => transporter.sendMail(mailOptions, async (error) => {
       if (error) {
         Logger.warn('Mail sending failed, check your service credentials.');
         resolve(false);
@@ -172,7 +171,7 @@ export class MailSenderService {
     });
   }
 
-  private createSocials(): string {
+  private static createSocials(): string {
     let socials = '';
     config.project.socials.forEach((social) => {
       socials += `<a href="${social[1]}" style="box-sizing:border-box;color:${

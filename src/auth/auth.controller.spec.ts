@@ -6,7 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { UserService } from '../user/user.service';
-import { default as config } from '../config';
+import config from '../config';
 
 describe('Auth Controller', () => {
   let controller: AuthController;
@@ -51,5 +51,6 @@ describe('Auth Controller', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+    expect(spyService).toBeDefined();
   });
 });

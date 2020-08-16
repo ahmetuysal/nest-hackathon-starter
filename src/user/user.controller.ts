@@ -35,7 +35,7 @@ export class UserController {
     if (id !== user.id || id !== updateRequest.user.id) {
       throw new UnauthorizedException();
     }
-    updateUserEntityFields(user, updateRequest.user);
-    await this.userService.updateUser(user);
+    const updatedUser = updateUserEntityFields(user, updateRequest.user);
+    await this.userService.updateUser(updatedUser);
   }
 }

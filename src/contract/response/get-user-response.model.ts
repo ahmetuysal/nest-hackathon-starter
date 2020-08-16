@@ -1,4 +1,4 @@
-import { User } from '..';
+import { User } from '../models/user.model';
 
 export class GetUserResponse {
   user: User;

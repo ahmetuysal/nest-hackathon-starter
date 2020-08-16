@@ -47,27 +47,27 @@ export function toUserModel(userEntity: User): IUser {
 export function updateUserEntityFields(
   userEntity: User,
   userModel: IUser,
-): void {
+): User {
+  const updatedUserEntity = new User();
   // id cannot change
-  if (userModel.username !== undefined) {
-    userEntity.username = userModel.username;
-  }
+  updatedUserEntity.id = userEntity.id;
+  updatedUserEntity.username = (userModel.username !== undefined)
+    ? userModel.username : userEntity.username;
   // email update is separated
+  updatedUserEntity.email = userEntity.email;
   // email verification is separated
-  if (userModel.firstName !== undefined) {
-    userEntity.firstName = userModel.firstName;
-  }
-  if (userModel.lastName !== undefined) {
-    userEntity.lastName = userModel.lastName;
-  }
-  if (userModel.middleName !== undefined) {
-    userEntity.middleName = userModel.middleName;
-  }
-  if (userModel.image !== undefined) {
-    userEntity.image = userModel.image;
-  }
-  if (userModel.birthDate !== undefined) {
-    userEntity.birthDate = userModel.birthDate;
-  }
+  updatedUserEntity.emailVerified = userEntity.emailVerified;
+  updatedUserEntity.firstName = (userModel.firstName !== undefined)
+    ? userModel.firstName : userEntity.firstName;
+  updatedUserEntity.lastName = (userModel.lastName !== undefined)
+    ? userModel.lastName : userEntity.lastName;
+  updatedUserEntity.middleName = (userModel.middleName !== undefined)
+    ? userModel.middleName : userEntity.middleName;
+  updatedUserEntity.image = (userModel.image !== undefined)
+    ? userModel.image : userEntity.image;
+  updatedUserEntity.birthDate = (userModel.birthDate !== undefined)
+    ? userModel.birthDate : userEntity.birthDate;
   // registrationDate can't be updated
+  updatedUserEntity.registrationDate = userEntity.registrationDate;
+  return updatedUserEntity;
 }

@@ -27,5 +27,6 @@ describe('User Controller', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+    expect(spyService).toBeDefined();
   });
 });

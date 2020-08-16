@@ -32,7 +32,7 @@ export class AuthController {
   async checkUsernameAvailability(
     @Body() checkUsernameRequest: CheckUsernameRequest,
   ): Promise<CheckUsernameResponse> {
-    return await this.authService.checkUsername(checkUsernameRequest);
+    return this.authService.checkUsername(checkUsernameRequest);
   }
 
   @Post('check-email')
@@ -40,7 +40,7 @@ export class AuthController {
   async checkEmailAvailability(
     @Body() checkEmailRequest: CheckEmailRequest,
   ): Promise<CheckEmailResponse> {
-    return await this.authService.checkEmail(checkEmailRequest);
+    return this.authService.checkEmail(checkEmailRequest);
   }
 
   @Post('signup')

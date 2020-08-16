@@ -24,5 +24,6 @@ module.exports = {
     ],
     '@typescript-eslint/interface-name-prefix': 'off',
     'import/prefer-default-export': 'off',
+    'class-methods-use-this': 'warn',
   },
 };

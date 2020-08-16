@@ -39,7 +39,6 @@ export class AuthService {
     private readonly emailChangeRepository: Repository<EmailChange>,
     @InjectRepository(PasswordReset)
     private readonly passwordResetRepository: Repository<PasswordReset>,
-    private readonly mailSenderService: MailSenderService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {
@@ -68,7 +67,7 @@ export class AuthService {
       throw new InternalServerErrorException(err);
     }
 
-    await this.mailSenderService.sendVerifyEmailMail(
+    await MailSenderService.sendVerifyEmailMail(
       signupRequest.firstName,
       signupRequest.email,
       token,
@@ -101,7 +100,7 @@ export class AuthService {
       emailVerification,
     );
 
-    await this.mailSenderService.sendVerifyEmailMail(
+    await MailSenderService.sendVerifyEmailMail(
       name,
       email,
       emailVerification.token,
@@ -171,7 +170,7 @@ export class AuthService {
       throw new InternalServerErrorException(err);
     }
 
-    await this.mailSenderService.sendChangeEmailMail(name, oldEmail, token);
+    await MailSenderService.sendChangeEmailMail(name, oldEmail, token);
   }
 
   async changeEmail(token: string): Promise<void> {
@@ -221,7 +220,7 @@ export class AuthService {
       throw new InternalServerErrorException(err);
     }
 
-    await this.mailSenderService.sendResetPasswordMail(
+    await MailSenderService.sendResetPasswordMail(
       userEntity.firstName,
       userEntity.email,
       token,
@@ -256,13 +255,13 @@ export class AuthService {
     userId: number,
     name: string,
     email: string,
-  ) {
+  ): Promise<void> {
     await this.userService.updatePassword(
       userId,
       await bcrypt.hash(changePasswordRequest.newPassword, 10),
     );
 
-    await this.mailSenderService.sendPasswordChangeInfoMail(name, email);
+    await MailSenderService.sendPasswordChangeInfoMail(name, email);
   }
 
   async validateUser(payload: JwtPayload): Promise<User> {
@@ -295,7 +294,7 @@ export class AuthService {
       username: userEntity.username,
     };
 
-    return await this.jwtService.signAsync(payload);
+    return this.jwtService.signAsync(payload);
   }
 
   async checkUsername(

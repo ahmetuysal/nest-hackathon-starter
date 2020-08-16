@@ -16,25 +16,25 @@ export class UserService {
   }
 
   public async getUserEntityById(id: number): Promise<User> {
-    return await this.userRepository.findOne(id);
+    return this.userRepository.findOne(id);
   }
 
   public async getUserEntityByUsername(username: string): Promise<User> {
-    username = username.toLowerCase();
-    return await this.userRepository.findOne({ where: { username } });
+    const normalizedUsername = username.toLowerCase();
+    return this.userRepository.findOne({ where: { username: normalizedUsername } });
   }
 
   public async getUserEntityByEmail(email: string): Promise<User> {
-    email = email.toLowerCase();
-    return await this.userRepository.findOne({ where: { email } });
+    const normalizedEmail = email.toLowerCase();
+    return this.userRepository.findOne({ where: { email: normalizedEmail } });
   }
 
   public async getUserEntityByUsernameOrEmail(
     identifier: string,
   ): Promise<User> {
-    identifier = identifier.toLowerCase();
-    return await this.userRepository.findOne({
-      where: [{ username: identifier }, { email: identifier }],
+    const normalizedIdentifier = identifier.toLowerCase();
+    return this.userRepository.findOne({
+      where: [{ username: normalizedIdentifier }, { email: normalizedIdentifier }],
     });
   }
 
