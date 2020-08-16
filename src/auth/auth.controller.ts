@@ -1,4 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ChangeEmailRequest,
   ChangePasswordRequest,
@@ -13,8 +17,6 @@ import {
   SignupRequest,
 } from '../contract';
 import { AuthService } from './auth.service';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
 import { Usr } from '../user/user.decorator';
 import { User } from '../user/user.entity';
 import { toUserModel } from '../user/user.mapper';
@@ -73,7 +75,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async sendChangeEmailMail(
     @Usr() user: User,
-    @Body() changeEmailRequest: ChangeEmailRequest,
+      @Body() changeEmailRequest: ChangeEmailRequest,
   ): Promise<void> {
     await this.authService.sendChangeEmailMail(
       changeEmailRequest,
@@ -100,7 +102,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async changePassword(
     @Body() changePasswordRequest: ChangePasswordRequest,
-    @Usr() user: User,
+      @Usr() user: User,
   ): Promise<void> {
     await this.authService.changePassword(
       changePasswordRequest,

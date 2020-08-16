@@ -1,4 +1,6 @@
-import { Column, Entity, Index, PrimaryColumn, Unique } from 'typeorm';
+import {
+  Column, Entity, Index, PrimaryColumn, Unique,
+} from 'typeorm';
 
 @Entity('password-reset')
 @Unique('unique_password-reset_userId', ['userId'])

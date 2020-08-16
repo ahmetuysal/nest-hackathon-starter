@@ -6,6 +6,11 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { nanoid } from 'nanoid';
 import {
   ChangeEmailRequest,
   ChangePasswordRequest,
@@ -18,17 +23,12 @@ import {
   SignupRequest,
 } from '../contract';
 import { UserService } from '../user/user.service';
-import * as bcrypt from 'bcrypt';
 import { JwtPayload } from './jwt-payload.interface';
 import { User } from '../user/user.entity';
-import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
 import { EmailVerification } from './email-verification.entity';
-import { Repository } from 'typeorm';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { EmailChange } from './email-change.entity';
 import { PasswordReset } from './password-reset.entity';
-import { nanoid } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -268,14 +268,13 @@ export class AuthService {
   async validateUser(payload: JwtPayload): Promise<User> {
     const userEntity = await this.userService.getUserEntityById(payload.id);
     if (
-      userEntity !== undefined &&
-      userEntity.email === payload.email &&
-      userEntity.username === payload.username
+      userEntity !== undefined
+      && userEntity.email === payload.email
+      && userEntity.username === payload.username
     ) {
       return userEntity;
-    } else {
-      throw new UnauthorizedException();
     }
+    throw new UnauthorizedException();
   }
 
   async login(loginRequest: LoginRequest): Promise<string> {
@@ -284,8 +283,8 @@ export class AuthService {
     );
 
     if (
-      userEntity === null || userEntity === undefined ||
-      !bcrypt.compareSync(loginRequest.password, userEntity.passwordHash)
+      userEntity === null || userEntity === undefined
+      || !bcrypt.compareSync(loginRequest.password, userEntity.passwordHash)
     ) {
       throw new UnauthorizedException();
     }

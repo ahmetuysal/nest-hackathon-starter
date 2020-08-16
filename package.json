@@ -10,12 +10,12 @@
   "license": "MIT",
   "scripts": {
     "build": "rimraf dist && tsc -p tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
-    "start:debug": "tsc-watch -p tsconfig.build.json --onSuccess \"node --inspect-brk dist/main.js\"",
-    "start:prod": "node dist/main.js",
-    "lint": "tslint -p tsconfig.json -c tslint.json",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
@@ -58,6 +58,12 @@
     "@types/nodemailer": "^6.4.0",
     "@types/passport-jwt": "^3.0.3",
     "@types/supertest": "2.0.10",
+    "@typescript-eslint/eslint-plugin": "^3.9.0",
+    "@typescript-eslint/parser": "^3.9.0",
+    "eslint": "^7.7.0",
+    "eslint-config-airbnb-typescript": "^9.0.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
     "jest": "26.4.0",
     "prettier": "2.0.5",
     "supertest": "4.0.2",
@@ -65,8 +71,7 @@
     "ts-node": "8.10.2",
     "tsc-watch": "4.2.9",
     "tsconfig-paths": "3.9.0",
-    "tslint": "6.1.3",
-    "typescript": "3.9.7"
+    "typescript": "^3.9.7"
   },
   "jest": {
     "moduleFileExtensions": [

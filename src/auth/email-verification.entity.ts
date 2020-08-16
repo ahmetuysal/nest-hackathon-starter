@@ -1,4 +1,6 @@
-import { Column, Entity, Index, PrimaryColumn, Unique } from 'typeorm';
+import {
+  Column, Entity, Index, PrimaryColumn, Unique,
+} from 'typeorm';
 
 @Entity('email-verification')
 @Unique('unique_email-verification_userId', ['userId'])

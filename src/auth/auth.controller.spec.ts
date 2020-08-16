@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Repository } from 'typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { Repository } from 'typeorm';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { UserService } from '../user/user.service';
-import { JwtModule } from '@nestjs/jwt';
 import { default as config } from '../config';
-import { PassportModule } from '@nestjs/passport';
 
 describe('Auth Controller', () => {
   let controller: AuthController;

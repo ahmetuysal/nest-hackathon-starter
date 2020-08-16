@@ -10,8 +10,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { UserService } from './user.service';
 import { AuthGuard } from '@nestjs/passport';
+import { UserService } from './user.service';
 import { UpdateUserRequest } from '../contract';
 import { User } from './user.entity';
 import { Usr } from './user.decorator';
@@ -29,8 +29,8 @@ export class UserController {
   @UseGuards(AuthGuard())
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateRequest: UpdateUserRequest,
-    @Usr() user: User,
+      @Body() updateRequest: UpdateUserRequest,
+      @Usr() user: User,
   ): Promise<void> {
     if (id !== user.id || id !== updateRequest.user.id) {
       throw new UnauthorizedException();

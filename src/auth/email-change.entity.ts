@@ -1,4 +1,6 @@
-import { Column, Entity, Index, PrimaryColumn, Unique } from 'typeorm';
+import {
+  Column, Entity, Index, PrimaryColumn, Unique,
+} from 'typeorm';
 
 @Entity('email-change')
 @Unique('unique_email-change_userId', ['userId'])

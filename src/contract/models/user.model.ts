@@ -1,4 +1,6 @@
-import { IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsUrl, Matches, MaxLength } from 'class-validator';
+import {
+  IsBoolean, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsUrl, Matches, MaxLength,
+} from 'class-validator';
 
 export class User {
   @IsNumber()

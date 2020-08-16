@@ -1,7 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import { default as config } from '../config';
-import { changeMail, changePasswordInfo, confirmMail, resetPassword } from './templates';
+import {
+  changeMail, changePasswordInfo, confirmMail, resetPassword,
+} from './templates';
 
 @Injectable()
 export class MailSenderService {
@@ -38,15 +40,13 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => {
-      return transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          Logger.warn('Mail sending failed, check your service credentials.');
-          resolve(false);
-        }
-        resolve(true);
-      });
-    });
+    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        Logger.warn('Mail sending failed, check your service credentials.');
+        resolve(false);
+      }
+      resolve(true);
+    }));
   }
 
   async sendChangeEmailMail(
@@ -79,15 +79,13 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => {
-      return transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          Logger.warn('Mail sending failed, check your service credentials.');
-          resolve(false);
-        }
-        resolve(true);
-      });
-    });
+    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        Logger.warn('Mail sending failed, check your service credentials.');
+        resolve(false);
+      }
+      resolve(true);
+    }));
   }
 
   async sendResetPasswordMail(
@@ -120,15 +118,13 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => {
-      return transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          Logger.warn('Mail sending failed, check your service credentials.');
-          resolve(false);
-        }
-        resolve(true);
-      });
-    });
+    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        Logger.warn('Mail sending failed, check your service credentials.');
+        resolve(false);
+      }
+      resolve(true);
+    }));
   }
 
   async sendPasswordChangeInfoMail(name: string, email: string) {
@@ -155,15 +151,13 @@ export class MailSenderService {
       html: mail,
     };
 
-    return await new Promise<boolean>(async (resolve, reject) => {
-      return transporter.sendMail(mailOptions, async (error, info) => {
-        if (error) {
-          Logger.warn('Mail sending failed, check your service credentials.');
-          resolve(false);
-        }
-        resolve(true);
-      });
-    });
+    return await new Promise<boolean>(async (resolve, reject) => transporter.sendMail(mailOptions, async (error, info) => {
+      if (error) {
+        Logger.warn('Mail sending failed, check your service credentials.');
+        resolve(false);
+      }
+      resolve(true);
+    }));
   }
 
   private static createTransporter() {
@@ -180,7 +174,7 @@ export class MailSenderService {
 
   private createSocials(): string {
     let socials = '';
-    config.project.socials.forEach(social => {
+    config.project.socials.forEach((social) => {
       socials += `<a href="${social[1]}" style="box-sizing:border-box;color:${
         config.project.color
       };font-weight:400;text-decoration:none;font-size:12px;padding:0 5px" target="_blank">${

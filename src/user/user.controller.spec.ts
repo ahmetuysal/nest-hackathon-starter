@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserController } from './user.controller';
 import { PassportModule } from '@nestjs/passport';
-import { UserService } from './user.service';
 import { Repository } from 'typeorm';
+import { UserController } from './user.controller';
+import { UserService } from './user.service';
 
 describe('User Controller', () => {
   let controller: UserController;

@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AuthService } from './auth.service';
 import { Repository } from 'typeorm';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { AuthService } from './auth.service';
 import { EmailVerification } from './email-verification.entity';
 import { EmailChange } from './email-change.entity';
 import { PasswordReset } from './password-reset.entity';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { UserService } from '../user/user.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
 import { default as config } from '../config';
 
 describe('AuthService', () => {
@@ -19,7 +19,6 @@ describe('AuthService', () => {
   let spyEmailVerificationRepository: Repository<EmailVerification>;
   let spyEmailChangeRepository: Repository<EmailChange>;
   let spyPasswordResetRepository: Repository<PasswordReset>;
-
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
 import { Repository } from 'typeorm';
+import { UserService } from './user.service';
 import { User } from './user.entity';
 
 describe('UserService', () => {
@@ -20,7 +20,6 @@ describe('UserService', () => {
     service = module.get<UserService>(UserService);
     spyRepository = module.get<Repository<User>>('UserRepository');
   });
-
 
   describe('getUserEntityById', () => {
     it('should call repository with correct id', async () => {
@@ -43,7 +42,6 @@ describe('UserService', () => {
       expect(await service.getUserEntityById(userId))
         .toStrictEqual(userEntity);
     });
-
   });
 
   describe('getUserEntityByUsername', () => {
@@ -70,9 +68,7 @@ describe('UserService', () => {
       expect(await service.getUserEntityByUsername(username))
         .toStrictEqual(userEntity);
     });
-
   });
-
 
   it('should be defined', () => {
     expect(service).toBeDefined();
