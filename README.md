@@ -43,28 +43,18 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 This template uses Postgres by default. If you want to use another database, follow instructions in the [official Nest documentation](https://docs.nestjs.com/techniques/database) and use appropriate [column types](https://github.com/typeorm/typeorm/blob/master/src/driver/types/ColumnTypes.ts) for your entities.
 
-Enter your database configurations to [`ormconfig.yml`](ormconfig.yml).
+If you wish to use another database you will also have to edit [`ormconfig.js`](ormconfig.js) file accordingly.
 
-```yaml
-default:
-  type: postgres
-  host: localhost
-  port: 5432
-  username: __YOUR_USERNAME__
-  password: __YOUR_PASSWORD__
-  database: __YOUR_DATABASE__
-  synchronize: true
-  logging: true
-  entities:
-    - dist/**/*.entity.js
-  migrations:
-    - dist/database/migrations/**/*.js
-  subscribers:
-    - dist/database/subscriber/**/.js
-  cli:
-    entitiesDir: src
-    migrationsDir: database/migrations
-    subscribersDir: database/subscriber
+Template includes three different environment options by default. Most of the time you will use the `local`
+environment when developing and `production` environment on production. You will need to fill out corresponding
+environment files in [`env`](env) directory.
+
+```dosini
+DATABASE_HOST=__YOUR_DATABASE_URL__
+DATABASE_PORT=5432
+DATABASE_USERNAME=__YOUR_USERNAME__
+DATABASE_PASSWORD=__YOUR_PASSWORD__
+DATABASE_NAME=__YOUR_DATABASE__
 ```
 
 #### JWT Configurations
@@ -131,6 +121,27 @@ Mail templates are highly customizable and heavily depend on configurations. Ent
     resetPasswordUrl: 'http://localhost:4200/reset-password',
     termsOfServiceUrl: 'http://localhost:4200/legal/terms',
   },
+```
+
+### Migrations
+
+By default this template disables synchronize in favor of [migrations](https://typeorm.io/#/migrations).
+If you wish to enable synchronize you can edit [`ormconfig.js`](ormconfig.js) file.
+
+```bash
+# generate migration for local environment
+$ yarn migrations:generate:local
+# run migrations in local environment
+$ yarn migrations:run:local
+# revert latest run migration in local environment
+$ yarn migrations:revert:local
+
+# generate migration for production environment
+$ yarn migrations:generate:production
+# run migrations in production environment
+$ yarn migrations:generate:production
+# revert latest run migration in production environment
+$ yarn migrations:generate:local
 ```
 
 ### Running the app
