@@ -3,6 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as helmet from 'helmet';
 import * as rateLimit from 'express-rate-limit';
+import * as requestIp from 'request-ip';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -11,6 +12,8 @@ async function bootstrap() {
 
   // Request Validation
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+
+  app.use(requestIp.mw());
 
   // Helmet Middleware against known security vulnerabilities
   app.use(helmet());
@@ -21,6 +24,7 @@ async function bootstrap() {
       windowMs: 15 * 60 * 1000, // 15 minutes
       max: 500, // limit each IP to 500 requests per windowMs
       message: 'Too many requests from this IP, please try again later',
+      keyGenerator: (req) => requestIp.getClientIp(req),
     }),
   );
 
@@ -29,6 +33,7 @@ async function bootstrap() {
     max: 10, // start blocking after 10 requests
     message:
       'Too many accounts created from this IP, please try again after an hour',
+    keyGenerator: (req) => requestIp.getClientIp(req),
   });
   app.use('/auth/signup', signupLimiter);
 
@@ -45,7 +50,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000, '127.0.0.1');
 }
 
 bootstrap();
