@@ -1,24 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Repository } from 'typeorm';
 import { UserService } from './user.service';
-import { User } from './user.entity';
+import { UserEntity } from './entities/user.entity';
 
 describe('UserService', () => {
   let service: UserService;
-  let spyRepository: Repository<User>;
+  let spyRepository: Repository<UserEntity>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
         {
-          provide: 'UserRepository',
+          provide: 'UserEntityRepository',
           useClass: Repository,
         }],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    spyRepository = module.get<Repository<User>>('UserRepository');
+    spyRepository = module.get<Repository<UserEntity>>('UserEntityRepository');
   });
 
   describe('getUserEntityById', () => {
@@ -33,7 +33,7 @@ describe('UserService', () => {
     });
 
     it('should return the result from repository', async () => {
-      const userEntity = new User();
+      const userEntity = new UserEntity();
       const userId = 123123;
       const mockFindOne = jest.fn();
       mockFindOne.mockReturnValue(userEntity);
@@ -59,7 +59,7 @@ describe('UserService', () => {
     });
 
     it('should return the result from repository', async () => {
-      const userEntity = new User();
+      const userEntity = new UserEntity();
       const username = 'userName';
       const mockFindOne = jest.fn();
       mockFindOne.mockReturnValue(userEntity);

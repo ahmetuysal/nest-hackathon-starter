@@ -3,23 +3,21 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from './auth.service';
+import { Usr } from '../user/user.decorator';
+import { UserEntity } from '../user/entities/user.entity';
 import {
-  ChangeEmailRequest,
-  ChangePasswordRequest,
+  ChangeEmailRequest, ChangePasswordRequest,
   CheckEmailRequest,
   CheckEmailResponse,
   CheckUsernameRequest,
   CheckUsernameResponse,
-  GetUserResponse,
   LoginRequest,
   LoginResponse,
   ResetPasswordRequest,
   SignupRequest,
-} from '../contract';
-import { AuthService } from './auth.service';
-import { Usr } from '../user/user.decorator';
-import { User } from '../user/user.entity';
-import { toUserModel } from '../user/user.mapper';
+} from './models';
+import { UserResponse } from '../user/models';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -59,8 +57,8 @@ export class AuthController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
-  async getUserWithToken(@Usr() user: User): Promise<GetUserResponse> {
-    return new GetUserResponse(toUserModel(user));
+  async getUserWithToken(@Usr() user: UserEntity): Promise<UserResponse> {
+    return UserResponse.fromUserEntity(user);
   }
 
   @Get('verify')
@@ -74,7 +72,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async sendChangeEmailMail(
-    @Usr() user: User,
+    @Usr() user: UserEntity,
       @Body() changeEmailRequest: ChangeEmailRequest,
   ): Promise<void> {
     await this.authService.sendChangeEmailMail(
@@ -102,7 +100,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async changePassword(
     @Body() changePasswordRequest: ChangePasswordRequest,
-      @Usr() user: User,
+      @Usr() user: UserEntity,
   ): Promise<void> {
     await this.authService.changePassword(
       changePasswordRequest,
@@ -123,7 +121,7 @@ export class AuthController {
   @Post('resend-verification')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
-  async resendVerificationMail(@Usr() user: User): Promise<void> {
+  async resendVerificationMail(@Usr() user: UserEntity): Promise<void> {
     await this.authService.resendVerificationMail(
       user.firstName,
       user.email,

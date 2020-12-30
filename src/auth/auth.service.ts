@@ -11,6 +11,13 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { nanoid } from 'nanoid';
+import { UserService } from '../user/user.service';
+import { JwtPayload } from './jwt-payload.interface';
+import { UserEntity } from '../user/entities/user.entity';
+import { EmailVerification } from './entities/email-verification.entity';
+import { MailSenderService } from '../mail-sender/mail-sender.service';
+import { EmailChange } from './entities/email-change.entity';
+import { PasswordReset } from './entities/password-reset.entity';
 import {
   ChangeEmailRequest,
   ChangePasswordRequest,
@@ -21,14 +28,7 @@ import {
   LoginRequest,
   ResetPasswordRequest,
   SignupRequest,
-} from '../contract';
-import { UserService } from '../user/user.service';
-import { JwtPayload } from './jwt-payload.interface';
-import { User } from '../user/user.entity';
-import { EmailVerification } from './entities/email-verification.entity';
-import { MailSenderService } from '../mail-sender/mail-sender.service';
-import { EmailChange } from './entities/email-change.entity';
-import { PasswordReset } from './entities/password-reset.entity';
+} from './models';
 
 @Injectable()
 export class AuthService {
@@ -55,11 +55,7 @@ export class AuthService {
     const emailVerification = new EmailVerification();
     emailVerification.token = token;
     emailVerification.userId = createdUser.id;
-    // valid for 2 days
-    const twoDaysLater = new Date();
-    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
-    emailVerification.validUntil = twoDaysLater;
-
+    // valid for 2 days by default
     try {
       await this.emailVerificationRepository.insert(emailVerification);
     } catch (err) {
@@ -79,26 +75,15 @@ export class AuthService {
     email: string,
     userId: number,
   ): Promise<void> {
-    const emailVerification = await this.emailVerificationRepository.findOne({
-      where: { userId },
-    });
+    // delete old email verification tokens if exist
+    await this.emailVerificationRepository.delete({ userId });
 
-    if (emailVerification === null || emailVerification === undefined) {
-      Logger.log(
-        `User with id ${userId} called resend verification without a valid email verification`,
-      );
-      throw new NotFoundException();
-    }
-
-    // update validUntil to 2 days later
-    const twoDaysLater = new Date();
-    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
-    emailVerification.validUntil = twoDaysLater;
-
-    await this.emailVerificationRepository.update(
-      emailVerification.token,
-      emailVerification,
-    );
+    const token = nanoid();
+    const emailVerification = new EmailVerification();
+    emailVerification.token = token;
+    emailVerification.userId = userId;
+    // valid for 2 days by default
+    await this.emailVerificationRepository.insert(emailVerification);
 
     await MailSenderService.sendVerifyEmailMail(
       name,
@@ -108,17 +93,17 @@ export class AuthService {
   }
 
   async verifyEmail(token: string): Promise<void> {
-    const emailVerification = await this.emailVerificationRepository.findOne(
-      token,
-    );
+    const emailVerification = await this.emailVerificationRepository.createQueryBuilder('emailVerification')
+      .where('emailVerification.token=:token', { token })
+      .andWhere('"emailVerification"."validUntil">=TIMEZONE(\'UTC\', NOW())')
+      .select(['emailVerification.userId'])
+      .getOne();
 
-    if (emailVerification && emailVerification.validUntil > new Date()) {
-      const userEntity = await this.userService.getUserEntityById(
-        emailVerification.userId,
-      );
-      userEntity.emailVerified = true;
-      await this.userService.updateUser(userEntity);
-      await this.emailVerificationRepository.delete(emailVerification);
+    if (emailVerification) {
+      await Promise.all([
+        this.userService.verifyEmail(emailVerification.userId),
+        this.emailVerificationRepository.delete(token),
+      ]);
     } else {
       Logger.log(`Verify email called with invalid email token ${token}`);
       throw new NotFoundException();
@@ -144,25 +129,15 @@ export class AuthService {
       throw new ConflictException();
     }
 
-    // Invalidate old token if exists
-    const oldEmailChangeEntity = await this.emailChangeRepository.findOne({
-      userId,
-    });
-    if (oldEmailChangeEntity !== undefined) {
-      await this.emailChangeRepository.delete(oldEmailChangeEntity);
-      Logger.log(
-        `Email change token ${oldEmailChangeEntity.token} is invalidated`,
-      );
-    }
+    // delete old email change tokens if exist
+    await this.emailChangeRepository.delete({ userId });
 
     const token = nanoid();
     const emailChange = new EmailChange();
     emailChange.token = token;
     emailChange.userId = userId;
-    // valid for 2 days
-    const twoDaysLater = new Date();
-    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
-    emailChange.validUntil = twoDaysLater;
+    emailChange.newEmail = changeEmailRequest.newEmail;
+    // valid for 2 days by default
     try {
       await this.emailChangeRepository.insert(emailChange);
     } catch (err) {
@@ -174,14 +149,17 @@ export class AuthService {
   }
 
   async changeEmail(token: string): Promise<void> {
-    const emailChange = await this.emailChangeRepository.findOne(token);
-    if (emailChange && emailChange.validUntil > new Date()) {
-      const userEntity = await this.userService.getUserEntityById(
-        emailChange.userId,
-      );
-      userEntity.email = emailChange.newEmail;
-      await this.userService.updateUser(userEntity);
-      await this.emailChangeRepository.delete(emailChange);
+    const emailChange = await this.emailChangeRepository.createQueryBuilder('emailChange')
+      .where('emailChange.token=:token', { token })
+      .andWhere('"emailChange"."validUntil">=TIMEZONE(\'UTC\', NOW())')
+      .select(['emailChange.userId', 'emailChange.newEmail'])
+      .getOne();
+
+    if (emailChange) {
+      await Promise.all([
+        this.userService.updateEmail(emailChange.userId, emailChange.newEmail),
+        this.emailChangeRepository.delete(token),
+      ]);
     } else {
       Logger.log(`Invalid email change token ${token} is rejected.`);
       throw new NotFoundException();
@@ -196,23 +174,14 @@ export class AuthService {
 
     const userId = userEntity.id;
     // Invalidate old token if exists
-    const oldResetPasswordEntity = await this.passwordResetRepository.findOne({
+    await this.passwordResetRepository.delete({
       userId,
     });
-    if (oldResetPasswordEntity !== undefined) {
-      await this.passwordResetRepository.delete(oldResetPasswordEntity);
-      Logger.log(
-        `Password reset token ${oldResetPasswordEntity.token} is invalidated`,
-      );
-    }
     const token = nanoid();
     const passwordReset = new PasswordReset();
     passwordReset.token = token;
     passwordReset.userId = userId;
-    // valid for 2 days
-    const twoDaysLater = new Date();
-    twoDaysLater.setDate(twoDaysLater.getDate() + 2);
-    passwordReset.validUntil = twoDaysLater;
+    // valid for 2 days by default
     try {
       await this.emailChangeRepository.insert(passwordReset);
     } catch (err) {
@@ -230,20 +199,22 @@ export class AuthService {
   async resetPassword(
     resetPasswordRequest: ResetPasswordRequest,
   ): Promise<void> {
-    const passwordResetEntity = await this.passwordResetRepository.findOne(
-      resetPasswordRequest.token,
-    );
+    const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder('passwordReset')
+      .where('passwordReset.token=:token', { token: resetPasswordRequest.token })
+      .andWhere('"passwordReset"."validUntil">=TIMEZONE(\'UTC\', NOW())')
+      .select(['passwordReset.userId'])
+      .getOne();
 
-    if (passwordResetEntity && passwordResetEntity.validUntil > new Date()) {
+    if (passwordResetEntity) {
       await this.userService.updatePassword(
         passwordResetEntity.userId,
         await bcrypt.hash(resetPasswordRequest.newPassword, 10),
       );
-      await this.passwordResetRepository.delete(passwordResetEntity);
+      await this.passwordResetRepository.delete(resetPasswordRequest.token);
     } else {
       Logger.log(
         `Invalid reset password token ${
-          resetPasswordRequest.newPassword
+          resetPasswordRequest.token
         } is rejected`,
       );
       throw new NotFoundException();
@@ -264,7 +235,7 @@ export class AuthService {
     await MailSenderService.sendPasswordChangeInfoMail(name, email);
   }
 
-  async validateUser(payload: JwtPayload): Promise<User> {
+  async validateUser(payload: JwtPayload): Promise<UserEntity> {
     const userEntity = await this.userService.getUserEntityById(payload.id);
     if (
       userEntity !== undefined

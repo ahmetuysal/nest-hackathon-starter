@@ -13,7 +13,7 @@ describe('User Controller', () => {
       controllers: [UserController],
       providers: [UserService,
         {
-          provide: 'UserRepository',
+          provide: 'UserEntityRepository',
           useClass: Repository,
         }],
       imports: [

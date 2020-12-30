@@ -11,6 +11,6 @@ export class PasswordReset {
   @Column('integer')
   userId: number;
 
-  @Column('timestamp')
-  validUntil: Date;
+  @Column('timestamp', { default: () => 'timezone(\'utc\', now()) + interval \'2 days\'' })
+  validUntil: string; // ISO Date
 }

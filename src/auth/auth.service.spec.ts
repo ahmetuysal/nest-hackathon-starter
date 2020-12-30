@@ -34,7 +34,7 @@ describe('AuthService', () => {
         MailSenderService,
         UserService,
         {
-          provide: 'UserRepository',
+          provide: 'UserEntityRepository',
           useClass: Repository,
         },
         {

@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './auth.controller';
-import { User } from '../user/user.entity';
+import { UserEntity } from '../user/entities/user.entity';
 import config from '../config';
 import { JwtStrategy } from './jwt.strategy';
 import { MailSenderModule } from '../mail-sender/mail-sender.module';
@@ -16,7 +16,7 @@ import { PasswordReset } from './entities/password-reset.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
-      User,
+      UserEntity,
       EmailVerification,
       EmailChange,
       PasswordReset,

@@ -2,36 +2,36 @@ import {
   BadRequestException, ConflictException, Injectable, Logger, NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { validate } from 'class-validator';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
-import { SignupRequest } from '../contract';
+import { UserEntity } from './entities/user.entity';
+import { SignupRequest } from '../auth/models';
+import { UpdateUserRequest } from './models';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {
   }
 
-  public async getUserEntityById(id: number): Promise<User> {
+  public async getUserEntityById(id: number): Promise<UserEntity> {
     return this.userRepository.findOne(id);
   }
 
-  public async getUserEntityByUsername(username: string): Promise<User> {
+  public async getUserEntityByUsername(username: string): Promise<UserEntity> {
     const normalizedUsername = username.toLowerCase();
     return this.userRepository.findOne({ where: { username: normalizedUsername } });
   }
 
-  public async getUserEntityByEmail(email: string): Promise<User> {
+  public async getUserEntityByEmail(email: string): Promise<UserEntity> {
     const normalizedEmail = email.toLowerCase();
     return this.userRepository.findOne({ where: { email: normalizedEmail } });
   }
 
   public async getUserEntityByUsernameOrEmail(
     identifier: string,
-  ): Promise<User> {
+  ): Promise<UserEntity> {
     const normalizedIdentifier = identifier.toLowerCase();
     return this.userRepository.findOne({
       where: [{ username: normalizedIdentifier }, { email: normalizedIdentifier }],
@@ -41,15 +41,14 @@ export class UserService {
   public async createUser(
     signupRequest: SignupRequest,
     passwordHash: string,
-  ): Promise<User> {
-    const newUser = new User();
+  ): Promise<UserEntity> {
+    const newUser = new UserEntity();
     newUser.username = signupRequest.username.toLowerCase();
     newUser.email = signupRequest.email.toLowerCase();
     newUser.passwordHash = passwordHash;
     newUser.firstName = signupRequest.firstName;
     newUser.lastName = signupRequest.lastName;
     newUser.middleName = signupRequest.middleName;
-    newUser.registrationDate = new Date();
     try {
       // insert also updates id of newUser, we can directly return newUser
       await this.userRepository.insert(newUser);
@@ -71,28 +70,23 @@ export class UserService {
       );
       throw new NotFoundException();
     }
-
-    userEntity.passwordHash = passwordHash;
-    await this.userRepository.update(userEntity.id, userEntity);
+    await this.userRepository.update(userEntity.id, { passwordHash });
   }
 
-  public async updateUser(userEntity: User): Promise<void> {
-    // TODO: Email update should be separated
-    await UserService.validateUser(userEntity);
+  async updateUser(userId: number, updateRequest: UpdateUserRequest): Promise<void> {
     try {
-      await this.userRepository.update(userEntity.id, userEntity);
+      await this.userRepository.update(userId, updateRequest);
     } catch (err) {
       Logger.warn(JSON.stringify(err));
       throw new BadRequestException();
     }
   }
 
-  private static async validateUser(user: User): Promise<void> {
-    const errors = await validate(user, {
-      validationError: { target: false },
-    });
-    if (errors.length > 0) {
-      throw new BadRequestException(errors);
-    }
+  async updateEmail(userId: number, email: string): Promise<void> {
+    await this.userRepository.update(userId, { email });
+  }
+
+  async verifyEmail(userId:number) : Promise<void> {
+    await this.userRepository.update(userId, { emailVerified: true });
   }
 }

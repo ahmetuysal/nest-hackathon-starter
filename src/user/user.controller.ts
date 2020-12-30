@@ -12,10 +12,9 @@ import {
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UserService } from './user.service';
-import { UpdateUserRequest } from '../contract';
-import { User } from './user.entity';
+import { UserEntity } from './entities/user.entity';
 import { Usr } from './user.decorator';
-import { updateUserEntityFields } from './user.mapper';
+import { UpdateUserRequest } from './models';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,12 +29,11 @@ export class UserController {
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
       @Body() updateRequest: UpdateUserRequest,
-      @Usr() user: User,
+      @Usr() user: UserEntity,
   ): Promise<void> {
-    if (id !== user.id || id !== updateRequest.user.id) {
+    if (id !== user.id) {
       throw new UnauthorizedException();
     }
-    const updatedUser = updateUserEntityFields(user, updateRequest.user);
-    await this.userService.updateUser(updatedUser);
+    await this.userService.updateUser(id, updateRequest);
   }
 }
