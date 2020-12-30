@@ -1,10 +1,9 @@
 import {
-  Column, Entity, Index, PrimaryColumn, Unique,
+  Column, Entity, Index, PrimaryColumn,
 } from 'typeorm';
 
 @Entity('password-reset')
-@Unique('unique_password-reset_userId', ['userId'])
-@Index('index_password-reset_userId', ['userId'])
+@Index('index_password-reset_userId', ['userId'], { unique: true })
 export class PasswordReset {
   @PrimaryColumn('character', { length: 21 })
   token: string;

@@ -25,10 +25,10 @@ import {
 import { UserService } from '../user/user.service';
 import { JwtPayload } from './jwt-payload.interface';
 import { User } from '../user/user.entity';
-import { EmailVerification } from './email-verification.entity';
+import { EmailVerification } from './entities/email-verification.entity';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
-import { EmailChange } from './email-change.entity';
-import { PasswordReset } from './password-reset.entity';
+import { EmailChange } from './entities/email-change.entity';
+import { PasswordReset } from './entities/password-reset.entity';
 
 @Injectable()
 export class AuthService {

@@ -1,10 +1,9 @@
 import {
-  Column, Entity, Index, PrimaryColumn, Unique,
+  Column, Entity, Index, PrimaryColumn,
 } from 'typeorm';
 
 @Entity('email-verification')
-@Unique('unique_email-verification_userId', ['userId'])
-@Index('index_email-verification_userId', ['userId'])
+@Index('index_email-verification_userId', ['userId'], { unique: true })
 export class EmailVerification {
   @PrimaryColumn('character', { length: 21 })
   token: string;

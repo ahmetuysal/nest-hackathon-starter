@@ -9,9 +9,9 @@ import { User } from '../user/user.entity';
 import config from '../config';
 import { JwtStrategy } from './jwt.strategy';
 import { MailSenderModule } from '../mail-sender/mail-sender.module';
-import { EmailVerification } from './email-verification.entity';
-import { EmailChange } from './email-change.entity';
-import { PasswordReset } from './password-reset.entity';
+import { EmailVerification } from './entities/email-verification.entity';
+import { EmailChange } from './entities/email-change.entity';
+import { PasswordReset } from './entities/password-reset.entity';
 
 @Module({
   imports: [

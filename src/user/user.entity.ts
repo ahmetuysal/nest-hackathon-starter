@@ -1,5 +1,5 @@
 import {
-  Column, Entity, Index, PrimaryGeneratedColumn, Unique,
+  Column, Entity, Index, PrimaryGeneratedColumn,
 } from 'typeorm';
 import {
   IsBoolean, IsEmail, IsLowercase, IsNotEmpty, IsOptional, IsUrl, Matches, MaxLength,
@@ -7,10 +7,8 @@ import {
 import { User as IUser } from '../contract';
 
 @Entity('user')
-@Unique('unique_user_username', ['username'])
-@Unique('unique_user_email', ['email'])
-@Index('index_user_username', ['username'])
-@Index('index_user_email', ['email'])
+@Index('index_user_username', ['username'], { unique: true })
+@Index('index_user_email', ['email'], { unique: true })
 export class User implements IUser {
   @PrimaryGeneratedColumn()
   id: number;

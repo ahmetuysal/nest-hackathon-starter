@@ -1,10 +1,9 @@
 import {
-  Column, Entity, Index, PrimaryColumn, Unique,
+  Column, Entity, Index, PrimaryColumn,
 } from 'typeorm';
 
 @Entity('email-change')
-@Unique('unique_email-change_userId', ['userId'])
-@Index('index_email-change_userId', ['userId'])
+@Index('index_email-change_userId', ['userId'], { unique: true })
 export class EmailChange {
   @PrimaryColumn('character', { length: 21 })
   token: string;
