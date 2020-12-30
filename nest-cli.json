@@ -7,9 +7,7 @@
       {
         "name": "@nestjs/swagger/plugin",
         "options": {
-          "dtoFileNameSuffix": [
-            ".model.ts"
-          ]
+          "dtoFileNameSuffix": [".model.ts", ".request.ts", ".response.ts"]
         }
       }
     ]
