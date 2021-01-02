@@ -13,7 +13,7 @@ module.exports = {
   synchronize: false,
   logging: (process.env.NODE_ENV || 'local').toLowerCase() !== 'production',
   migrationsRun: false,
-  entities: ['dist/**/*.entity.js'],
+  entities: [process.env.ENTITIES_PATH],
   migrations: ['dist/database/migrations/**/*.js'],
   subscribers: ['dist/database/subscriber/**/*.js'],
   cli: {

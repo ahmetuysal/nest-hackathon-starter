@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class Unicourse1609354207004 implements MigrationInterface {
-  name = 'Unicourse1609354207004';
+export class HackathonStarter1609354207004 implements MigrationInterface {
+  name = 'HackathonStarter1609354207004';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query('ALTER TABLE "email-change" ALTER COLUMN "validUntil" SET DEFAULT timezone(\'utc\', now()) + interval \'2 days\'');

@@ -22,8 +22,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migration:generate:local": "npm run clean && nest build && cross-env NODE_ENV=local typeorm migration:generate -n Unicourse",
-    "migration:generate:production": "npm run clean && nest build && cross-env NODE_ENV=production typeorm migration:generate -n Unicourse",
+    "migration:generate:local": "npm run clean && nest build && cross-env NODE_ENV=local typeorm migration:generate -n HackathonStarter",
+    "migration:generate:production": "npm run clean && nest build && cross-env NODE_ENV=production typeorm migration:generate -n HackathonStarter",
     "migration:run:local": "npm run clean && nest build && cross-env NODE_ENV=local typeorm migration:run",
     "migration:run:production": "nest build && cross-env NODE_ENV=production typeorm migration:run",
     "migration:revert:local": "cross-env NODE_ENV=local typeorm migration:revert",
@@ -105,7 +105,7 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "roots": ["src", "test"],
     "testRegex": ".spec.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
