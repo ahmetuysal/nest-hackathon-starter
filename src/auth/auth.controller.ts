@@ -85,7 +85,7 @@ export class AuthController {
 
   @Get('change-email')
   @HttpCode(HttpStatus.OK)
-  async changeEmail(@Param('token') token: string): Promise<void> {
+  async changeEmail(@Query('token') token: string): Promise<void> {
     await this.authService.changeEmail(token);
   }
 
