@@ -183,7 +183,7 @@ export class AuthService {
     passwordReset.userId = userId;
     // valid for 2 days by default
     try {
-      await this.emailChangeRepository.insert(passwordReset);
+      await this.passwordResetRepository.insert(passwordReset);
     } catch (err) {
       Logger.error(JSON.stringify(err));
       throw new InternalServerErrorException(err);
