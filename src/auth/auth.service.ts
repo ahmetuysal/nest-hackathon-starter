@@ -117,7 +117,7 @@ export class AuthService {
     oldEmail: string,
   ): Promise<void> {
     // Check whether email is in use
-    const userEntity = await this.userService.getUserEntityByUsername(
+    const userEntity = await this.userService.getUserEntityByEmail(
       changeEmailRequest.newEmail,
     );
     if (userEntity !== undefined) {
