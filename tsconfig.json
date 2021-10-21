@@ -7,6 +7,8 @@
     "experimentalDecorators": true,
     "target": "es2017",
     "sourceMap": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,

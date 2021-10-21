@@ -42,9 +42,6 @@ async function bootstrap() {
     .setTitle('NestJS Hackathon Starter by @ahmetuysal')
     .setDescription('NestJS Hackathon Starter API description')
     .setVersion('0.1.0')
-    .addTag('auth')
-    .addTag('users')
-    // You can add new tags for your controllers here
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);

@@ -15,23 +15,23 @@ export class UserService {
   ) {
   }
 
-  public async getUserEntityById(id: number): Promise<UserEntity> {
+  public async getUserEntityById(id: number): Promise<UserEntity | undefined> {
     return this.userRepository.findOne(id);
   }
 
-  public async getUserEntityByUsername(username: string): Promise<UserEntity> {
+  public async getUserEntityByUsername(username: string): Promise<UserEntity | undefined> {
     const normalizedUsername = username.toLowerCase();
     return this.userRepository.findOne({ where: { username: normalizedUsername } });
   }
 
-  public async getUserEntityByEmail(email: string): Promise<UserEntity> {
+  public async getUserEntityByEmail(email: string): Promise<UserEntity | undefined> {
     const normalizedEmail = email.toLowerCase();
     return this.userRepository.findOne({ where: { email: normalizedEmail } });
   }
 
   public async getUserEntityByUsernameOrEmail(
     identifier: string,
-  ): Promise<UserEntity> {
+  ): Promise<UserEntity | undefined> {
     const normalizedIdentifier = identifier.toLowerCase();
     return this.userRepository.findOne({
       where: [{ username: normalizedIdentifier }, { email: normalizedIdentifier }],
@@ -48,7 +48,7 @@ export class UserService {
     newUser.passwordHash = passwordHash;
     newUser.firstName = signupRequest.firstName;
     newUser.lastName = signupRequest.lastName;
-    newUser.middleName = signupRequest.middleName;
+    newUser.middleName = signupRequest.middleName ?? null;
     try {
       // insert also updates id of newUser, we can directly return newUser
       await this.userRepository.insert(newUser);
