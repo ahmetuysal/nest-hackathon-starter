@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PassportModule } from '@nestjs/passport';
-import { Repository } from 'typeorm';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
+import { PrismaService } from '../common/services/prisma.service';
 
 describe('User Controller', () => {
   let controller: UserController;
@@ -11,11 +11,7 @@ describe('User Controller', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
-      providers: [UserService,
-        {
-          provide: 'UserEntityRepository',
-          useClass: Repository,
-        }],
+      providers: [UserService, PrismaService],
       imports: [
         PassportModule.register({ defaultStrategy: 'jwt' }),
       ],

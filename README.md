@@ -8,7 +8,7 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 ## Features
 
-1. **PostgreSQL with TypeORM**
+1. **PostgreSQL with Prisma**
 
 2. **JWT Authentication**
 
@@ -32,18 +32,18 @@ You can also look at my [Angular Hackathon Starter](https://github.com/ahmetuysa
 
 ### Installation
 
-1. Make sure that you have [Node.js](https://nodejs.org)(>= 8.9.0) installed.
+1. Make sure that you have [Node.js](https://nodejs.org)(>= 10.13.0, except for v13) installed.
 2. Clone this repository by running `git clone https://github.com/ahmetuysal/nest-hackathon-starter.git <YOUR_PROJECT_NAME>` or [directly create your own GitHub repository using this template](https://github.com/ahmetuysal/nest-hackathon-starter/generate).
 3. Move to the appropriate directory: `cd <YOUR_PROJECT_NAME>`.
 4. Run `yarn` to install dependencies.
 
 ### Configuration Files
 
-#### [TypeORM](https://github.com/typeorm/typeorm) Configurations
+#### [Prisma](https://github.com/prisma/prisma) Configurations
 
-This template uses Postgres by default. If you want to use another database, follow instructions in the [official Nest documentation](https://docs.nestjs.com/techniques/database) and use appropriate [column types](https://github.com/typeorm/typeorm/blob/master/src/driver/types/ColumnTypes.ts) for your entities.
+This template uses Postgres by default. If you want to use another database, follow instructions in the [official Nest recipe on Prisma](https://docs.nestjs.com/recipes/prisma).
 
-If you wish to use another database you will also have to edit [`ormconfig.js`](ormconfig.js) file accordingly.
+If you wish to use another database you will also have to edit the connection string on [`prisma/.env`](prisma/.env) file accordingly.
 
 Template includes three different environment options by default. Most of the time you will use the `local`
 environment when developing and `production` environment on production. You will need to fill out corresponding
@@ -125,42 +125,40 @@ Mail templates are highly customizable and heavily depend on configurations. Ent
 
 ### Migrations
 
-By default this template disables synchronize in favor of [migrations](https://typeorm.io/#/migrations).
-If you wish to enable synchronize you can edit [`ormconfig.js`](ormconfig.js) file.
+Please refer to the official [Prisma Migrate Guide](https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate) to get more info about Prisma migrations.
 
 ```bash
 # generate migration for local environment
-$ yarn migrations:generate:local
+$ yarn migrate:dev:create
 # run migrations in local environment
-$ yarn migrations:run:local
-# revert latest run migration in local environment
-$ yarn migrations:revert:local
+$ yarn migrate:dev
 
-# generate migration for production environment
-$ yarn migrations:generate:production
-# run migrations in production environment
-$ yarn migrations:generate:production
-# revert latest run migration in production environment
-$ yarn migrations:generate:local
+# deploy migration to prod environment
+$ yarn migrate:deploy:prod
 ```
 
 ### Running the app
 
 ```bash
-$ nest start
+# development mode
+$ yarn start:dev
+
+# production
+$ yarn build
+$ yarn start:prod
 ```
 
 ### Running the tests
 
 ```bash
 # unit tests
-$ yarn run test
+$ yarn test
 
 # e2e tests
-$ yarn run test:e2e
+$ yarn test:e2e
 
 # test coverage
-$ yarn run test:cov
+$ yarn test:cov
 ```
 
 ## Support Nest

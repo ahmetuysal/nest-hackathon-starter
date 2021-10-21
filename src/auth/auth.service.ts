@@ -1,72 +1,68 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { nanoid } from 'nanoid';
+import { Prisma } from '@prisma/client';
 import { UserService } from '../user/user.service';
-import { JwtPayload } from './jwt-payload.interface';
-import { UserEntity } from '../user/entities/user.entity';
-import { EmailVerification } from './entities/email-verification.entity';
+import { JwtPayload } from './jwt-payload';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
-import { EmailChange } from './entities/email-change.entity';
-import { PasswordReset } from './entities/password-reset.entity';
 import {
   ChangeEmailRequest,
   ChangePasswordRequest,
-  CheckEmailRequest,
-  CheckEmailResponse,
-  CheckUsernameRequest,
-  CheckUsernameResponse,
   LoginRequest,
   ResetPasswordRequest,
   SignupRequest,
 } from './models';
+import { AuthUser } from './auth-user';
+import { PrismaService } from '../common/services/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(EmailVerification)
-    private readonly emailVerificationRepository: Repository<EmailVerification>,
-    @InjectRepository(EmailChange)
-    private readonly emailChangeRepository: Repository<EmailChange>,
-    @InjectRepository(PasswordReset)
-    private readonly passwordResetRepository: Repository<PasswordReset>,
+    private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {
   }
 
   async signup(signupRequest: SignupRequest): Promise<void> {
-    const createdUser = await this.userService.createUser(
-      signupRequest,
-      await bcrypt.hash(signupRequest.password, 10),
-    );
+    const emailVerificationToken = nanoid();
 
-    const token = nanoid();
-
-    const emailVerification = new EmailVerification();
-    emailVerification.token = token;
-    emailVerification.userId = createdUser.id;
-    // valid for 2 days by default
     try {
-      await this.emailVerificationRepository.insert(emailVerification);
-    } catch (err) {
-      Logger.error(JSON.stringify(err));
-      throw new InternalServerErrorException(err);
+      await this.prisma.user.create({
+        data: {
+          username: signupRequest.username.toLowerCase(),
+          email: signupRequest.email.toLowerCase(),
+          passwordHash: await bcrypt.hash(signupRequest.password, 10),
+          firstName: signupRequest.firstName,
+          lastName: signupRequest.lastName,
+          middleName: signupRequest.middleName,
+          emailVerification: {
+            create: {
+              token: emailVerificationToken,
+            },
+          },
+        },
+        select: null,
+      });
+    } catch (e) {
+      if (e instanceof Prisma.PrismaClientKnownRequestError) {
+        if (e.code === 'P2002') { // unique constraint
+          throw new ConflictException();
+        } else throw e;
+      } else throw e;
     }
 
     await MailSenderService.sendVerifyEmailMail(
       signupRequest.firstName,
       signupRequest.email,
-      token,
+      emailVerificationToken,
     );
   }
 
@@ -76,34 +72,42 @@ export class AuthService {
     userId: number,
   ): Promise<void> {
     // delete old email verification tokens if exist
-    await this.emailVerificationRepository.delete({ userId });
+    const deletePrevEmailVerificationIfExist = this.prisma.emailVerification.deleteMany({
+      where: { userId },
+    });
 
     const token = nanoid();
-    const emailVerification = new EmailVerification();
-    emailVerification.token = token;
-    emailVerification.userId = userId;
-    // valid for 2 days by default
-    await this.emailVerificationRepository.insert(emailVerification);
+
+    const createEmailVerification = this.prisma.emailVerification.create({
+      data: {
+        userId,
+        token,
+      },
+      select: null,
+    });
+
+    await this.prisma.$transaction([deletePrevEmailVerificationIfExist, createEmailVerification]);
 
     await MailSenderService.sendVerifyEmailMail(
       name,
       email,
-      emailVerification.token,
+      token,
     );
   }
 
   async verifyEmail(token: string): Promise<void> {
-    const emailVerification = await this.emailVerificationRepository.createQueryBuilder('emailVerification')
-      .where('emailVerification.token=:token', { token })
-      .andWhere('"emailVerification"."validUntil">=TIMEZONE(\'UTC\', NOW())')
-      .select(['emailVerification.userId'])
-      .getOne();
+    const emailVerification = await this.prisma.emailVerification.findUnique({
+      where: { token },
+    });
 
-    if (emailVerification) {
-      await Promise.all([
-        this.userService.verifyEmail(emailVerification.userId),
-        this.emailVerificationRepository.delete(token),
-      ]);
+    if (emailVerification !== null && emailVerification.validUntil > new Date()) {
+      await this.prisma.user.update({
+        where: { id: emailVerification.userId },
+        data: {
+          emailVerified: true,
+        },
+        select: null,
+      });
     } else {
       Logger.log(`Verify email called with invalid email token ${token}`);
       throw new NotFoundException();
@@ -116,11 +120,8 @@ export class AuthService {
     name: string,
     oldEmail: string,
   ): Promise<void> {
-    // Check whether email is in use
-    const userEntity = await this.userService.getUserEntityByEmail(
-      changeEmailRequest.newEmail,
-    );
-    if (userEntity !== undefined) {
+    const emailAvailable = await this.isEmailAvailable(changeEmailRequest.newEmail);
+    if (!emailAvailable) {
       Logger.log(
         `User with id ${userId} tried to change its email to already used ${
           changeEmailRequest.newEmail
@@ -129,37 +130,39 @@ export class AuthService {
       throw new ConflictException();
     }
 
-    // delete old email change tokens if exist
-    await this.emailChangeRepository.delete({ userId });
+    const deletePrevEmailChangeIfExist = this.prisma.emailChange.deleteMany({
+      where: { userId },
+    });
 
     const token = nanoid();
-    const emailChange = new EmailChange();
-    emailChange.token = token;
-    emailChange.userId = userId;
-    emailChange.newEmail = changeEmailRequest.newEmail;
-    // valid for 2 days by default
-    try {
-      await this.emailChangeRepository.insert(emailChange);
-    } catch (err) {
-      Logger.error(JSON.stringify(err));
-      throw new InternalServerErrorException(err);
-    }
+
+    const createEmailChange = this.prisma.emailChange.create({
+      data: {
+        userId,
+        token,
+        newEmail: changeEmailRequest.newEmail,
+      },
+      select: null,
+    });
+
+    await this.prisma.$transaction([deletePrevEmailChangeIfExist, createEmailChange]);
 
     await MailSenderService.sendChangeEmailMail(name, oldEmail, token);
   }
 
   async changeEmail(token: string): Promise<void> {
-    const emailChange = await this.emailChangeRepository.createQueryBuilder('emailChange')
-      .where('emailChange.token=:token', { token })
-      .andWhere('"emailChange"."validUntil">=TIMEZONE(\'UTC\', NOW())')
-      .select(['emailChange.userId', 'emailChange.newEmail'])
-      .getOne();
+    const emailChange = await this.prisma.emailChange.findUnique({
+      where: { token },
+    });
 
-    if (emailChange) {
-      await Promise.all([
-        this.userService.updateEmail(emailChange.userId, emailChange.newEmail),
-        this.emailChangeRepository.delete(token),
-      ]);
+    if (emailChange !== null && emailChange.validUntil > new Date()) {
+      await this.prisma.user.update({
+        where: { id: emailChange.userId },
+        data: {
+          email: emailChange.newEmail.toLowerCase(),
+        },
+        select: null,
+      });
     } else {
       Logger.log(`Invalid email change token ${token} is rejected.`);
       throw new NotFoundException();
@@ -167,31 +170,38 @@ export class AuthService {
   }
 
   async sendResetPasswordMail(email: string): Promise<void> {
-    const userEntity = await this.userService.getUserEntityByUsername(email);
-    if (userEntity === null || userEntity === undefined) {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: {
+        id: true,
+        firstName: true,
+        email: true,
+      },
+    });
+
+    if (user === null) {
       throw new NotFoundException();
     }
 
-    const userId = userEntity.id;
-    // Invalidate old token if exists
-    await this.passwordResetRepository.delete({
-      userId,
+    const deletePrevPasswordResetIfExist = this.prisma.passwordReset.deleteMany({
+      where: { userId: user.id },
     });
+
     const token = nanoid();
-    const passwordReset = new PasswordReset();
-    passwordReset.token = token;
-    passwordReset.userId = userId;
-    // valid for 2 days by default
-    try {
-      await this.passwordResetRepository.insert(passwordReset);
-    } catch (err) {
-      Logger.error(JSON.stringify(err));
-      throw new InternalServerErrorException(err);
-    }
+
+    const createPasswordReset = this.prisma.passwordReset.create({
+      data: {
+        userId: user.id,
+        token,
+      },
+      select: null,
+    });
+
+    await this.prisma.$transaction([deletePrevPasswordResetIfExist, createPasswordReset]);
 
     await MailSenderService.sendResetPasswordMail(
-      userEntity.firstName,
-      userEntity.email,
+      user.firstName,
+      user.email,
       token,
     );
   }
@@ -199,18 +209,19 @@ export class AuthService {
   async resetPassword(
     resetPasswordRequest: ResetPasswordRequest,
   ): Promise<void> {
-    const passwordResetEntity = await this.passwordResetRepository.createQueryBuilder('passwordReset')
-      .where('passwordReset.token=:token', { token: resetPasswordRequest.token })
-      .andWhere('"passwordReset"."validUntil">=TIMEZONE(\'UTC\', NOW())')
-      .select(['passwordReset.userId'])
-      .getOne();
+    const passwordReset = await this.prisma.passwordReset.findUnique({
+      where: { token: resetPasswordRequest.token },
+    });
 
-    if (passwordResetEntity) {
-      await this.userService.updatePassword(
-        passwordResetEntity.userId,
-        await bcrypt.hash(resetPasswordRequest.newPassword, 10),
-      );
-      await this.passwordResetRepository.delete(resetPasswordRequest.token);
+    if (passwordReset !== null && passwordReset.validUntil > new Date()) {
+      await this.prisma.user.update({
+        where: { id: passwordReset.userId },
+        data: {
+          passwordHash: await bcrypt.hash(resetPasswordRequest.newPassword, 10),
+
+        },
+        select: null,
+      });
     } else {
       Logger.log(
         `Invalid reset password token ${
@@ -227,62 +238,89 @@ export class AuthService {
     name: string,
     email: string,
   ): Promise<void> {
-    await this.userService.updatePassword(
-      userId,
-      await bcrypt.hash(changePasswordRequest.newPassword, 10),
-    );
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        passwordHash: await bcrypt.hash(changePasswordRequest.newPassword, 10),
+      },
+      select: null,
+    });
 
-    await MailSenderService.sendPasswordChangeInfoMail(name, email);
+    // no need to wait for information email
+    MailSenderService.sendPasswordChangeInfoMail(name, email);
   }
 
-  async validateUser(payload: JwtPayload): Promise<UserEntity> {
-    const userEntity = await this.userService.getUserEntityById(payload.id);
+  async validateUser(payload: JwtPayload): Promise<AuthUser> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+
     if (
-      userEntity !== undefined
-      && userEntity.email === payload.email
-      && userEntity.username === payload.username
+      user !== null
+      && user.email === payload.email
+      && user.username === payload.username
     ) {
-      return userEntity;
+      return user;
     }
     throw new UnauthorizedException();
   }
 
   async login(loginRequest: LoginRequest): Promise<string> {
-    const userEntity = await this.userService.getUserEntityByUsernameOrEmail(
-      loginRequest.identifier,
-    );
+    const normalizedIdentifier = loginRequest.identifier.toLowerCase();
+    const user = await this.prisma.user.findFirst({
+      where: {
+        OR: [
+          {
+            username: normalizedIdentifier,
+          },
+          {
+            email: normalizedIdentifier,
+          },
+        ],
+      },
+      select: {
+        id: true,
+        passwordHash: true,
+        email: true,
+        username: true,
+      },
+    });
 
     if (
-      userEntity === null || userEntity === undefined
-      || !bcrypt.compareSync(loginRequest.password, userEntity.passwordHash)
+      user === null
+      || !bcrypt.compareSync(loginRequest.password, user.passwordHash)
     ) {
       throw new UnauthorizedException();
     }
 
     const payload: JwtPayload = {
-      id: userEntity.id,
-      email: userEntity.email,
-      username: userEntity.username,
+      id: user.id,
+      email: user.email,
+      username: user.username,
     };
 
     return this.jwtService.signAsync(payload);
   }
 
-  async checkUsername(
-    checkUsernameRequest: CheckUsernameRequest,
-  ): Promise<CheckUsernameResponse> {
-    const userEntity = await this.userService.getUserEntityByUsername(
-      checkUsernameRequest.username,
-    );
-    return new CheckUsernameResponse(userEntity === null || userEntity === undefined);
+  async isUsernameAvailable(
+    username: string,
+  ): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { username: username.toLowerCase() },
+      select: { username: true },
+    });
+    return user === null;
   }
 
-  async checkEmail(
-    checkEmailRequest: CheckEmailRequest,
-  ): Promise<CheckEmailResponse> {
-    const userEntity = await this.userService.getUserEntityByEmail(
-      checkEmailRequest.email,
-    );
-    return new CheckEmailResponse(userEntity === null || userEntity === undefined);
+  async isEmailAvailable(
+    email: string,
+  ): Promise<boolean> {
+    const user = await this.prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: { email: true },
+    });
+    return user === null;
   }
 }

@@ -1,4 +1,4 @@
-import { UserEntity } from '../entities/user.entity';
+import type { User } from '@prisma/client';
 
 export class UserResponse {
   id: number;
@@ -13,11 +13,11 @@ export class UserResponse {
 
   image: string | null;
 
-  birthDate: string | null; // ISO Date
+  birthDate: Date | null; // ISO Date
 
-  registrationDate: string; // ISO Date
+  registrationDate: Date; // ISO Date
 
-  static fromUserEntity(entity: UserEntity): UserResponse {
+  static fromUserEntity(entity: User): UserResponse {
     const response = new UserResponse();
     response.id = entity.id;
     response.username = entity.username;

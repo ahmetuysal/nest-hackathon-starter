@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Repository } from 'typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
@@ -7,6 +6,7 @@ import { AuthService } from './auth.service';
 import { MailSenderService } from '../mail-sender/mail-sender.service';
 import { UserService } from '../user/user.service';
 import config from '../config';
+import { PrismaService } from '../common/services/prisma.service';
 
 describe('Auth Controller', () => {
   let controller: AuthController;
@@ -27,22 +27,8 @@ describe('Auth Controller', () => {
         AuthService,
         MailSenderService,
         UserService,
-        {
-          provide: 'UserEntityRepository',
-          useClass: Repository,
-        },
-        {
-          provide: 'EmailVerificationRepository',
-          useClass: Repository,
-        },
-        {
-          provide: 'EmailChangeRepository',
-          useClass: Repository,
-        },
-        {
-          provide: 'PasswordResetRepository',
-          useClass: Repository,
-        }],
+        PrismaService,
+      ],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);

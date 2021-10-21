@@ -5,7 +5,6 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Usr } from '../user/user.decorator';
-import { UserEntity } from '../user/entities/user.entity';
 import {
   ChangeEmailRequest, ChangePasswordRequest,
   CheckEmailRequest,
@@ -18,6 +17,7 @@ import {
   SignupRequest,
 } from './models';
 import { UserResponse } from '../user/models';
+import { AuthUser } from './auth-user';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,7 +30,8 @@ export class AuthController {
   async checkUsernameAvailability(
     @Body() checkUsernameRequest: CheckUsernameRequest,
   ): Promise<CheckUsernameResponse> {
-    return this.authService.checkUsername(checkUsernameRequest);
+    const isAvailable = await this.authService.isUsernameAvailable(checkUsernameRequest.username);
+    return new CheckUsernameResponse(isAvailable);
   }
 
   @Post('check-email')
@@ -38,7 +39,8 @@ export class AuthController {
   async checkEmailAvailability(
     @Body() checkEmailRequest: CheckEmailRequest,
   ): Promise<CheckEmailResponse> {
-    return this.authService.checkEmail(checkEmailRequest);
+    const isAvailable = await this.authService.isEmailAvailable(checkEmailRequest.email);
+    return new CheckEmailResponse(isAvailable);
   }
 
   @Post('signup')
@@ -57,7 +59,7 @@ export class AuthController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
-  async getUserWithToken(@Usr() user: UserEntity): Promise<UserResponse> {
+  async getUserWithToken(@Usr() user: AuthUser): Promise<UserResponse> {
     return UserResponse.fromUserEntity(user);
   }
 
@@ -72,7 +74,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
   async sendChangeEmailMail(
-    @Usr() user: UserEntity,
+    @Usr() user: AuthUser,
       @Body() changeEmailRequest: ChangeEmailRequest,
   ): Promise<void> {
     await this.authService.sendChangeEmailMail(
@@ -100,7 +102,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async changePassword(
     @Body() changePasswordRequest: ChangePasswordRequest,
-      @Usr() user: UserEntity,
+      @Usr() user: AuthUser,
   ): Promise<void> {
     await this.authService.changePassword(
       changePasswordRequest,
@@ -121,7 +123,7 @@ export class AuthController {
   @Post('resend-verification')
   @HttpCode(HttpStatus.OK)
   @UseGuards(AuthGuard())
-  async resendVerificationMail(@Usr() user: UserEntity): Promise<void> {
+  async resendVerificationMail(@Usr() user: AuthUser): Promise<void> {
     await this.authService.resendVerificationMail(
       user.firstName,
       user.email,
