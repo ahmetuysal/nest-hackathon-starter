@@ -28,8 +28,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {
-  }
+    private readonly mailSenderService: MailSenderService,
+  ) {}
 
   async signup(signupRequest: SignupRequest): Promise<void> {
     const emailVerificationToken = nanoid();
@@ -53,13 +53,14 @@ export class AuthService {
       });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError) {
-        if (e.code === 'P2002') { // unique constraint
+        if (e.code === 'P2002') {
+          // unique constraint
           throw new ConflictException();
         } else throw e;
       } else throw e;
     }
 
-    await MailSenderService.sendVerifyEmailMail(
+    await this.mailSenderService.sendVerifyEmailMail(
       signupRequest.firstName,
       signupRequest.email,
       emailVerificationToken,
@@ -86,13 +87,12 @@ export class AuthService {
       select: null,
     });
 
-    await this.prisma.$transaction([deletePrevEmailVerificationIfExist, createEmailVerification]);
+    await this.prisma.$transaction([
+      deletePrevEmailVerificationIfExist,
+      createEmailVerification,
+    ]);
 
-    await MailSenderService.sendVerifyEmailMail(
-      name,
-      email,
-      token,
-    );
+    await this.mailSenderService.sendVerifyEmailMail(name, email, token);
   }
 
   async verifyEmail(token: string): Promise<void> {
@@ -100,7 +100,10 @@ export class AuthService {
       where: { token },
     });
 
-    if (emailVerification !== null && emailVerification.validUntil > new Date()) {
+    if (
+      emailVerification !== null
+      && emailVerification.validUntil > new Date()
+    ) {
       await this.prisma.user.update({
         where: { id: emailVerification.userId },
         data: {
@@ -120,12 +123,12 @@ export class AuthService {
     name: string,
     oldEmail: string,
   ): Promise<void> {
-    const emailAvailable = await this.isEmailAvailable(changeEmailRequest.newEmail);
+    const emailAvailable = await this.isEmailAvailable(
+      changeEmailRequest.newEmail,
+    );
     if (!emailAvailable) {
       Logger.log(
-        `User with id ${userId} tried to change its email to already used ${
-          changeEmailRequest.newEmail
-        }`,
+        `User with id ${userId} tried to change its email to already used ${changeEmailRequest.newEmail}`,
       );
       throw new ConflictException();
     }
@@ -145,9 +148,12 @@ export class AuthService {
       select: null,
     });
 
-    await this.prisma.$transaction([deletePrevEmailChangeIfExist, createEmailChange]);
+    await this.prisma.$transaction([
+      deletePrevEmailChangeIfExist,
+      createEmailChange,
+    ]);
 
-    await MailSenderService.sendChangeEmailMail(name, oldEmail, token);
+    await this.mailSenderService.sendChangeEmailMail(name, oldEmail, token);
   }
 
   async changeEmail(token: string): Promise<void> {
@@ -183,9 +189,11 @@ export class AuthService {
       throw new NotFoundException();
     }
 
-    const deletePrevPasswordResetIfExist = this.prisma.passwordReset.deleteMany({
-      where: { userId: user.id },
-    });
+    const deletePrevPasswordResetIfExist = this.prisma.passwordReset.deleteMany(
+      {
+        where: { userId: user.id },
+      },
+    );
 
     const token = nanoid();
 
@@ -197,9 +205,12 @@ export class AuthService {
       select: null,
     });
 
-    await this.prisma.$transaction([deletePrevPasswordResetIfExist, createPasswordReset]);
+    await this.prisma.$transaction([
+      deletePrevPasswordResetIfExist,
+      createPasswordReset,
+    ]);
 
-    await MailSenderService.sendResetPasswordMail(
+    await this.mailSenderService.sendResetPasswordMail(
       user.firstName,
       user.email,
       token,
@@ -218,15 +229,12 @@ export class AuthService {
         where: { id: passwordReset.userId },
         data: {
           passwordHash: await bcrypt.hash(resetPasswordRequest.newPassword, 10),
-
         },
         select: null,
       });
     } else {
       Logger.log(
-        `Invalid reset password token ${
-          resetPasswordRequest.token
-        } is rejected`,
+        `Invalid reset password token ${resetPasswordRequest.token} is rejected`,
       );
       throw new NotFoundException();
     }
@@ -249,7 +257,7 @@ export class AuthService {
     });
 
     // no need to wait for information email
-    MailSenderService.sendPasswordChangeInfoMail(name, email);
+    this.mailSenderService.sendPasswordChangeInfoMail(name, email);
   }
 
   async validateUser(payload: JwtPayload): Promise<AuthUser> {
@@ -304,9 +312,7 @@ export class AuthService {
     return this.jwtService.signAsync(payload);
   }
 
-  async isUsernameAvailable(
-    username: string,
-  ): Promise<boolean> {
+  async isUsernameAvailable(username: string): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { username: username.toLowerCase() },
       select: { username: true },
@@ -314,9 +320,7 @@ export class AuthService {
     return user === null;
   }
 
-  async isEmailAvailable(
-    email: string,
-  ): Promise<boolean> {
+  async isEmailAvailable(email: string): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { email: email.toLowerCase() },
       select: { email: true },
