@@ -14,6 +14,8 @@ import {
 export class MailSenderService {
   private transporter: Mail;
 
+  private socials: string;
+
   private logger = new Logger('MailSenderService');
 
   constructor() {
@@ -26,6 +28,9 @@ export class MailSenderService {
       port: config.mail.service.port,
       secure: config.mail.service.secure,
     });
+    this.socials = config.project.socials.map(
+      (social) => `<a href="${social[1]}" style="box-sizing:border-box;color:${config.project.color};font-weight:400;text-decoration:none;font-size:12px;padding:0 5px" target="_blank">${social[0]}</a>`,
+    ).join('');
   }
 
   async sendVerifyEmailMail(
@@ -33,7 +38,6 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const socials = this.createSocials();
     const buttonLink = `${config.project.mailVerificationUrl}?token=${token}`;
 
     const mail = confirmMail
@@ -44,7 +48,7 @@ export class MailSenderService {
       .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
       .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
       .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
-      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--Socials--', 'g'), this.socials)
       .replace(new RegExp('--ButtonLink--', 'g'), buttonLink)
       .replace(
         new RegExp('--TermsOfServiceLink--', 'g'),
@@ -74,8 +78,6 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const socials = this.createSocials();
-
     const buttonLink = `${config.project.mailChangeUrl}?token=${token}`;
 
     const mail = changeMail
@@ -86,7 +88,7 @@ export class MailSenderService {
       .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
       .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
       .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
-      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--Socials--', 'g'), this.socials)
       .replace(new RegExp('--ButtonLink--', 'g'), buttonLink);
 
     const mailOptions = {
@@ -112,7 +114,6 @@ export class MailSenderService {
     email: string,
     token: string,
   ): Promise<boolean> {
-    const socials = this.createSocials();
     const buttonLink = `${config.project.resetPasswordUrl}?token=${token}`;
 
     const mail = resetPassword
@@ -123,7 +124,7 @@ export class MailSenderService {
       .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
       .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
       .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
-      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--Socials--', 'g'), this.socials)
       .replace(new RegExp('--ButtonLink--', 'g'), buttonLink);
 
     const mailOptions = {
@@ -148,7 +149,6 @@ export class MailSenderService {
     name: string,
     email: string,
   ): Promise<boolean> {
-    const socials = this.createSocials();
     const buttonLink = config.project.url;
     const mail = changePasswordInfo
       .replace(new RegExp('--PersonName--', 'g'), name)
@@ -158,7 +158,7 @@ export class MailSenderService {
       .replace(new RegExp('--ProjectSlogan--', 'g'), config.project.slogan)
       .replace(new RegExp('--ProjectColor--', 'g'), config.project.color)
       .replace(new RegExp('--ProjectLink--', 'g'), config.project.url)
-      .replace(new RegExp('--Socials--', 'g'), socials)
+      .replace(new RegExp('--Socials--', 'g'), this.socials)
       .replace(new RegExp('--ButtonLink--', 'g'), buttonLink);
 
     const mailOptions = {
@@ -177,13 +177,5 @@ export class MailSenderService {
       }
       resolve(true);
     }));
-  }
-
-  private createSocials(): string {
-    let socials = '';
-    config.project.socials.forEach((social) => {
-      socials += `<a href="${social[1]}" style="box-sizing:border-box;color:${config.project.color};font-weight:400;text-decoration:none;font-size:12px;padding:0 5px" target="_blank">${social[0]}</a>`;
-    });
-    return socials;
   }
 }
