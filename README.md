@@ -1,6 +1,9 @@
 # Nest Hackathon Starter <a href="https://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" height="28px" alt="Nest Logo"/></a>
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This project contains boilerplate for creating APIs using [Nest](https://nestjs.com), a progressive [Node.js](http://nodejs.org) framework for building efficient and scalable server-side applications.
@@ -164,14 +167,6 @@ $ yarn test:e2e
 $ yarn test:cov
 ```
 
-## Support Nest
-
-Nest is an MIT-licensed open source project. If you'd like to join support Nest, please [read more here](https://docs.nestjs.com/support).
-
-## License
-
-Licenced under [MIT License](LICENSE). Nest is also MIT licensed.
-
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
@@ -181,6 +176,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
+    <td align="center"><a href="https://github.com/ahmetuysal"><img src="https://avatars.githubusercontent.com/u/26417668?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ahmet Uysal</b></sub></a><br /><a href="https://github.com/ahmetuysal/nest-hackathon-starter/commits?author=ahmetuysal" title="Code">💻</a> <a href="https://github.com/ahmetuysal/nest-hackathon-starter/commits?author=ahmetuysal" title="Documentation">📖</a> <a href="https://github.com/ahmetuysal/nest-hackathon-starter/commits?author=ahmetuysal" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://dnlytras.com"><img src="https://avatars.githubusercontent.com/u/4951004?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dimitrios Lytras</b></sub></a><br /><a href="https://github.com/ahmetuysal/nest-hackathon-starter/commits?author=dimitrisnl" title="Code">💻</a></td>
   </tr>
 </table>
@@ -191,3 +187,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+## Support Nest
+
+Nest is an MIT-licensed open source project. If you'd like to join support Nest, please [read more here](https://docs.nestjs.com/support).
+
+## License
+
+Licenced under [MIT License](LICENSE). Nest is also MIT licensed.
