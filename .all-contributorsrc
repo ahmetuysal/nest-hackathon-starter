@@ -1,0 +1,35 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "ahmetuysal",
+      "name": "Ahmet Uysal",
+      "avatar_url": "https://avatars.githubusercontent.com/u/26417668?v=4",
+      "profile": "https://github.com/ahmetuysal",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    },
+    {
+      "login": "dimitrisnl",
+      "name": "Dimitrios Lytras",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4951004?v=4",
+      "profile": "https://dnlytras.com",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "nest-hackathon-starter",
+  "projectOwner": "ahmetuysal",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
