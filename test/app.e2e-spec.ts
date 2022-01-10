@@ -32,5 +32,5 @@ describe('AppController (e2e)', () => {
 
   it('/ (GET)', () => request(app.getHttpServer())
     .get('/')
-    .expect(404));
+    .expect(200));
 });
