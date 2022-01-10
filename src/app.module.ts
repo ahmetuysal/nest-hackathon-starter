@@ -1,10 +1,27 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MailSenderModule } from './mail-sender/mail-sender.module';
+import { ThrottlerBehindProxyGuard } from './common/guards/throttler-behind-proxy.guard';
 
 @Module({
-  imports: [UserModule, AuthModule, MailSenderModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 50,
+    }),
+    UserModule,
+    AuthModule,
+    MailSenderModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerBehindProxyGuard,
+    },
+  ],
 })
 export class AppModule {
 }
