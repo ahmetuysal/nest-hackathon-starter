@@ -61,6 +61,7 @@
     "class-transformer": "^0.4.0",
     "class-validator": "^0.13.1",
     "dotenv": "^10.0.0",
+    "dotenv-cli": "4.1.1",
     "helmet": "^4.6.0",
     "nanoid": "^3.1.30",
     "nodemailer": "^6.7.0",
