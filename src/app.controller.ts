@@ -1,6 +1,4 @@
-import {
-  Controller, Get, HttpCode, HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('health-check')
@@ -8,6 +6,6 @@ import { ApiTags } from '@nestjs/swagger';
 export class AppController {
   @Get()
   @HttpCode(HttpStatus.OK)
-  healthCheck(): void {
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  healthCheck(): void {}
 }

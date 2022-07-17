@@ -12,9 +12,7 @@ describe('User Controller', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UserController],
       providers: [UserService, PrismaService],
-      imports: [
-        PassportModule.register({ defaultStrategy: 'jwt' }),
-      ],
+      imports: [PassportModule.register({ defaultStrategy: 'jwt' })],
     }).compile();
 
     controller = module.get<UserController>(UserController);

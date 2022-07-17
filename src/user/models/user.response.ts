@@ -24,7 +24,8 @@ export class UserResponse {
     response.email = entity.email;
     response.emailVerified = entity.emailVerified;
     response.name = [entity.firstName, entity.middleName, entity.lastName]
-      .filter((s) => s !== null).join(' ');
+      .filter((s) => s !== null)
+      .join(' ');
     response.image = entity.image;
     response.birthDate = entity.birthDate;
     response.registrationDate = entity.registrationDate;

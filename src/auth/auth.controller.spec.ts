@@ -22,13 +22,9 @@ describe('Auth Controller', () => {
             expiresIn: config.jwt.expiresIn,
           },
         }),
-        PassportModule.register({ defaultStrategy: 'jwt' })],
-      providers: [
-        AuthService,
-        MailSenderService,
-        UserService,
-        PrismaService,
+        PassportModule.register({ defaultStrategy: 'jwt' }),
       ],
+      providers: [AuthService, MailSenderService, UserService, PrismaService],
     }).compile();
 
     controller = module.get<AuthController>(AuthController);

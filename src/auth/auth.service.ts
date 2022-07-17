@@ -73,9 +73,10 @@ export class AuthService {
     userId: number,
   ): Promise<void> {
     // delete old email verification tokens if exist
-    const deletePrevEmailVerificationIfExist = this.prisma.emailVerification.deleteMany({
-      where: { userId },
-    });
+    const deletePrevEmailVerificationIfExist =
+      this.prisma.emailVerification.deleteMany({
+        where: { userId },
+      });
 
     const token = nanoid();
 
@@ -101,8 +102,8 @@ export class AuthService {
     });
 
     if (
-      emailVerification !== null
-      && emailVerification.validUntil > new Date()
+      emailVerification !== null &&
+      emailVerification.validUntil > new Date()
     ) {
       await this.prisma.user.update({
         where: { id: emailVerification.userId },
@@ -266,9 +267,9 @@ export class AuthService {
     });
 
     if (
-      user !== null
-      && user.email === payload.email
-      && user.username === payload.username
+      user !== null &&
+      user.email === payload.email &&
+      user.username === payload.username
     ) {
       return user;
     }
@@ -297,8 +298,8 @@ export class AuthService {
     });
 
     if (
-      user === null
-      || !bcrypt.compareSync(loginRequest.password, user.passwordHash)
+      user === null ||
+      !bcrypt.compareSync(loginRequest.password, user.passwordHash)
     ) {
       throw new UnauthorizedException();
     }

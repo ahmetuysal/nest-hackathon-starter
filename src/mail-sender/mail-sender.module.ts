@@ -5,5 +5,4 @@ import { MailSenderService } from './mail-sender.service';
   providers: [MailSenderService],
   exports: [MailSenderService],
 })
-export class MailSenderModule {
-}
+export class MailSenderModule {}

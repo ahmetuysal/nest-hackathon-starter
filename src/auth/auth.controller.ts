@@ -1,12 +1,21 @@
 import {
-  Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query, UseGuards,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { Usr } from '../user/user.decorator';
 import {
-  ChangeEmailRequest, ChangePasswordRequest,
+  ChangeEmailRequest,
+  ChangePasswordRequest,
   CheckEmailRequest,
   CheckEmailResponse,
   CheckUsernameRequest,
@@ -22,15 +31,16 @@ import { AuthUser } from './auth-user';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {
-  }
+  constructor(private readonly authService: AuthService) {}
 
   @Post('check-username')
   @HttpCode(HttpStatus.OK)
   async checkUsernameAvailability(
     @Body() checkUsernameRequest: CheckUsernameRequest,
   ): Promise<CheckUsernameResponse> {
-    const isAvailable = await this.authService.isUsernameAvailable(checkUsernameRequest.username);
+    const isAvailable = await this.authService.isUsernameAvailable(
+      checkUsernameRequest.username,
+    );
     return new CheckUsernameResponse(isAvailable);
   }
 
@@ -39,7 +49,9 @@ export class AuthController {
   async checkEmailAvailability(
     @Body() checkEmailRequest: CheckEmailRequest,
   ): Promise<CheckEmailResponse> {
-    const isAvailable = await this.authService.isEmailAvailable(checkEmailRequest.email);
+    const isAvailable = await this.authService.isEmailAvailable(
+      checkEmailRequest.email,
+    );
     return new CheckEmailResponse(isAvailable);
   }
 
@@ -75,7 +87,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async sendChangeEmailMail(
     @Usr() user: AuthUser,
-      @Body() changeEmailRequest: ChangeEmailRequest,
+    @Body() changeEmailRequest: ChangeEmailRequest,
   ): Promise<void> {
     await this.authService.sendChangeEmailMail(
       changeEmailRequest,
@@ -102,7 +114,7 @@ export class AuthController {
   @UseGuards(AuthGuard())
   async changePassword(
     @Body() changePasswordRequest: ChangePasswordRequest,
-      @Usr() user: AuthUser,
+    @Usr() user: AuthUser,
   ): Promise<void> {
     await this.authService.changePassword(
       changePasswordRequest,

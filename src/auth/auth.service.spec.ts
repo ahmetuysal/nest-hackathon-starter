@@ -23,7 +23,8 @@ describe('AuthService', () => {
           signOptions: {
             expiresIn: config.jwt.expiresIn,
           },
-        })],
+        }),
+      ],
       providers: [
         AuthService,
         MailSenderService,
