@@ -16,11 +16,14 @@ describe('UserService', () => {
         {
           provide: PrismaService,
           useFactory: () => mockDeep<PrismaService>(),
-        }],
+        },
+      ],
     }).compile();
 
     service = module.get<UserService>(UserService);
-    spyPrismaService = module.get(PrismaService) as DeepMockProxy<PrismaService>;
+    spyPrismaService = module.get(
+      PrismaService,
+    ) as DeepMockProxy<PrismaService>;
   });
 
   describe('getUserEntityById', () => {
@@ -30,7 +33,9 @@ describe('UserService', () => {
       await service.getUserEntityById(id);
 
       expect(spyPrismaService.user.findUnique).toBeCalledTimes(1);
-      expect(spyPrismaService.user.findUnique).toHaveBeenCalledWith({ where: { id } });
+      expect(spyPrismaService.user.findUnique).toHaveBeenCalledWith({
+        where: { id },
+      });
     });
 
     it('should return the result from repository', async () => {
@@ -39,8 +44,7 @@ describe('UserService', () => {
 
       spyPrismaService.user.findUnique.mockResolvedValue(user);
 
-      expect(await service.getUserEntityById(userId))
-        .toStrictEqual(user);
+      expect(await service.getUserEntityById(userId)).toStrictEqual(user);
     });
   });
 
@@ -52,8 +56,7 @@ describe('UserService', () => {
 
       expect(spyPrismaService.user.findUnique).toBeCalledTimes(1);
       expect(spyPrismaService.user.findUnique).toBeCalledWith({
-        where:
-          { username: username.toLowerCase() },
+        where: { username: username.toLowerCase() },
       });
     });
 
@@ -64,8 +67,9 @@ describe('UserService', () => {
 
       spyPrismaService.user.findUnique.mockResolvedValue(user);
 
-      expect(await service.getUserEntityByUsername(username))
-        .toStrictEqual(user);
+      expect(await service.getUserEntityByUsername(username)).toStrictEqual(
+        user,
+      );
     });
   });
 

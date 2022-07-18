@@ -10,15 +10,16 @@ describe('AuthController (e2e)', () => {
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    })
-      .compile();
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     // Request Validation
-    app.useGlobalPipes(new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      }),
+    );
     await app.init();
   });
 
@@ -43,7 +44,9 @@ describe('AuthController (e2e)', () => {
         .expect({
           statusCode: 400,
           error: 'Bad Request',
-          message: ['username must match /^[a-zA-Z0-9\\-]+$/ regular expression'],
+          message: [
+            'username must match /^[a-zA-Z0-9\\-]+$/ regular expression',
+          ],
         });
     });
   });

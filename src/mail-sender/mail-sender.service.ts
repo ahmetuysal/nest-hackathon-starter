@@ -28,9 +28,12 @@ export class MailSenderService {
       port: config.mail.service.port,
       secure: config.mail.service.secure,
     });
-    this.socials = config.project.socials.map(
-      (social) => `<a href="${social[1]}" style="box-sizing:border-box;color:${config.project.color};font-weight:400;text-decoration:none;font-size:12px;padding:0 5px" target="_blank">${social[0]}</a>`,
-    ).join('');
+    this.socials = config.project.socials
+      .map(
+        (social) =>
+          `<a href="${social[1]}" style="box-sizing:border-box;color:${config.project.color};font-weight:400;text-decoration:none;font-size:12px;padding:0 5px" target="_blank">${social[0]}</a>`,
+      )
+      .join('');
   }
 
   async sendVerifyEmailMail(
@@ -62,15 +65,17 @@ export class MailSenderService {
       html: mail,
     };
 
-    return new Promise<boolean>((resolve) => this.transporter.sendMail(mailOptions, async (error) => {
-      if (error) {
-        this.logger.warn(
-          'Mail sending failed, check your service credentials.',
-        );
-        resolve(false);
-      }
-      resolve(true);
-    }));
+    return new Promise<boolean>((resolve) =>
+      this.transporter.sendMail(mailOptions, async (error) => {
+        if (error) {
+          this.logger.warn(
+            'Mail sending failed, check your service credentials.',
+          );
+          resolve(false);
+        }
+        resolve(true);
+      }),
+    );
   }
 
   async sendChangeEmailMail(
@@ -98,15 +103,17 @@ export class MailSenderService {
       html: mail,
     };
 
-    return new Promise<boolean>((resolve) => this.transporter.sendMail(mailOptions, async (error) => {
-      if (error) {
-        this.logger.warn(
-          'Mail sending failed, check your service credentials.',
-        );
-        resolve(false);
-      }
-      resolve(true);
-    }));
+    return new Promise<boolean>((resolve) =>
+      this.transporter.sendMail(mailOptions, async (error) => {
+        if (error) {
+          this.logger.warn(
+            'Mail sending failed, check your service credentials.',
+          );
+          resolve(false);
+        }
+        resolve(true);
+      }),
+    );
   }
 
   async sendResetPasswordMail(
@@ -134,15 +141,17 @@ export class MailSenderService {
       html: mail,
     };
 
-    return new Promise<boolean>((resolve) => this.transporter.sendMail(mailOptions, async (error) => {
-      if (error) {
-        this.logger.warn(
-          'Mail sending failed, check your service credentials.',
-        );
-        resolve(false);
-      }
-      resolve(true);
-    }));
+    return new Promise<boolean>((resolve) =>
+      this.transporter.sendMail(mailOptions, async (error) => {
+        if (error) {
+          this.logger.warn(
+            'Mail sending failed, check your service credentials.',
+          );
+          resolve(false);
+        }
+        resolve(true);
+      }),
+    );
   }
 
   async sendPasswordChangeInfoMail(
@@ -168,14 +177,16 @@ export class MailSenderService {
       html: mail,
     };
 
-    return new Promise<boolean>((resolve) => this.transporter.sendMail(mailOptions, async (error) => {
-      if (error) {
-        this.logger.warn(
-          'Mail sending failed, check your service credentials.',
-        );
-        resolve(false);
-      }
-      resolve(true);
-    }));
+    return new Promise<boolean>((resolve) =>
+      this.transporter.sendMail(mailOptions, async (error) => {
+        if (error) {
+          this.logger.warn(
+            'Mail sending failed, check your service credentials.',
+          );
+          resolve(false);
+        }
+        resolve(true);
+      }),
+    );
   }
 }

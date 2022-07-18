@@ -9,19 +9,22 @@ describe('AppController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule,
+      imports: [
+        AppModule,
         ConfigModule.forRoot({
           envFilePath: 'env/test.env',
-        })],
-    })
-      .compile();
+        }),
+      ],
+    }).compile();
 
     app = moduleFixture.createNestApplication();
     // Request Validation
-    app.useGlobalPipes(new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    }));
+    app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        transform: true,
+      }),
+    );
 
     await app.init();
   });
@@ -30,7 +33,5 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-  it('/ (GET)', () => request(app.getHttpServer())
-    .get('/')
-    .expect(200));
+  it('/ (GET)', () => request(app.getHttpServer()).get('/').expect(200));
 });

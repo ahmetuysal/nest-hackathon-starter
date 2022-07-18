@@ -1,5 +1,10 @@
 import {
-  IsEmail, IsNotEmpty, IsOptional, Matches, MaxLength, MinLength,
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  Matches,
+  MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class SignupRequest {

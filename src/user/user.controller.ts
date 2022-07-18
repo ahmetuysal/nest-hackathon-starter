@@ -19,8 +19,7 @@ import { AuthUser } from '../auth/auth-user';
 @ApiTags('users')
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {
-  }
+  constructor(private readonly userService: UserService) {}
 
   @ApiBearerAuth()
   @Put(':id')
@@ -28,8 +27,8 @@ export class UserController {
   @UseGuards(AuthGuard())
   async updateUser(
     @Param('id', ParseIntPipe) id: number,
-      @Body() updateRequest: UpdateUserRequest,
-      @Usr() user: AuthUser,
+    @Body() updateRequest: UpdateUserRequest,
+    @Usr() user: AuthUser,
   ): Promise<void> {
     if (id !== user.id) {
       throw new UnauthorizedException();
